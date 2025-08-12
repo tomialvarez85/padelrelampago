@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
-import type { Tournament, Match } from '../types';
+import type { Tournament } from '../types';
 import { ArrowLeft, Play, Trophy, BarChart3 } from 'lucide-react';
 import MatchCard from './MatchCard';
 import GroupView from './GroupView';
