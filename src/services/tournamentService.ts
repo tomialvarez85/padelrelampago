@@ -981,72 +981,7 @@ export class TournamentService {
     });
   }
 
-  private static calculateOverallStats(tournament: Tournament): TeamStats[] {
-    const stats: { [teamId: string]: TeamStats } = {};
-    
-    // Inicializar estadísticas para todos los equipos
-    for (const team of tournament.teams) {
-      stats[team.id] = {
-        teamId: team.id,
-        teamName: team.name,
-        wins: 0,
-        losses: 0,
-        totalMatches: 0,
-        winPercentage: 0,
-        gamesFor: 0,
-        gamesAgainst: 0,
-        gamesDifference: 0,
-      };
-    }
 
-    // Calcular estadísticas de todos los partidos de todos los grupos
-    for (const group of tournament.groups) {
-      for (const match of group.matches) {
-        if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
-          stats[match.team1.id].totalMatches++;
-          stats[match.team2.id].totalMatches++;
-          
-          // Sumar games
-          stats[match.team1.id].gamesFor += match.team1Score;
-          stats[match.team1.id].gamesAgainst += match.team2Score;
-          stats[match.team2.id].gamesFor += match.team2Score;
-          stats[match.team2.id].gamesAgainst += match.team1Score;
-          
-          if (match.winner.id === match.team1.id) {
-            stats[match.team1.id].wins++;
-            stats[match.team2.id].losses++;
-          } else {
-            stats[match.team2.id].wins++;
-            stats[match.team1.id].losses++;
-          }
-        }
-      }
-    }
-
-    // Calcular porcentaje de victorias y diferencia de games
-    Object.values(stats).forEach(stat => {
-      stat.winPercentage = stat.totalMatches > 0 
-        ? (stat.wins / stat.totalMatches) * 100 
-        : 0;
-      stat.gamesDifference = stat.gamesFor - stat.gamesAgainst;
-    });
-
-    // Ordenar por criterios de clasificación: victorias, diferencia de games, games a favor
-    return Object.values(stats).sort((a, b) => {
-      // 1er criterio: Victorias
-      if (b.wins !== a.wins) {
-        return b.wins - a.wins;
-      }
-      
-      // 2do criterio: Diferencia de games
-      if (b.gamesDifference !== a.gamesDifference) {
-        return b.gamesDifference - a.gamesDifference;
-      }
-      
-      // 3er criterio: Games a favor
-      return b.gamesFor - a.gamesFor;
-    });
-  }
 
   static getTeamStats(tournamentId: string): TeamStats[] {
     const tournament = this.getTournament(tournamentId);
