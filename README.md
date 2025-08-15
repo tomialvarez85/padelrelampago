@@ -5,7 +5,7 @@ Una aplicación web moderna para gestionar torneos de pádel a 1 Set. Desarrolla
 ## ✨ Características
 
 - **Gestión de Equipos**: Ingresa fácilmente los apellidos de los jugadores para formar equipos
-- **Grupos Aleatorios**: El sistema divide automáticamente los equipos en grupos de manera aleatoria
+- **Armado de Grupos**: Distribución manual de equipos en grupos según preferencias
 - **Fase de Grupos**: Todos contra todos dentro de cada grupo
 - **Fase de Eliminación**: Cuartos de final, semifinales y final automáticas
 - **Gestión de Resultados**: Ingresa y edita los resultados de cada partido
@@ -49,14 +49,17 @@ npm run build
 
 ### 1. Crear un Torneo
 - Haz clic en "Crear Nuevo Torneo"
+- Ingresa el nombre del torneo
 - Ingresa los apellidos de ambos jugadores de cada equipo
 - Agrega al menos 4 equipos para poder crear el torneo
 - Haz clic en "Crear Torneo"
 
 ### 2. Iniciar el Torneo
 - Selecciona el torneo creado
-- Haz clic en "Iniciar Torneo"
-- El sistema generará automáticamente los grupos y partidos
+- Haz clic en "Armar Grupos" para distribuir los equipos manualmente
+- Puedes usar "Distribuir automáticamente" para una distribución inicial aleatoria
+- Ajusta los grupos según tus preferencias moviendo equipos entre grupos
+- Haz clic en "Crear Grupos y Iniciar Torneo" cuando estés satisfecho
 
 ### 3. Gestionar Partidos
 - Ve a la pestaña "Grupos" para ver todos los partidos de la fase de grupos
@@ -111,9 +114,9 @@ src/
 - Cálculo automático de estadísticas
 
 ### Lógica de Torneos
-- Generación aleatoria de grupos
+- Distribución manual de equipos en grupos
 - Creación automática de brackets de eliminación
-- Cálculo de posiciones por victorias
+- Cálculo de posiciones por victorias y games
 - Avance automático entre fases
 
 ### Interfaz de Usuario

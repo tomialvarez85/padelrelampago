@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
 import type { Team, Player } from '../types';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, Users } from 'lucide-react';
 
 interface CreateTournamentProps {
-  onTournamentCreated: () => void;
+  onTournamentCreated: (tournamentId: string) => void;
   onBack: () => void;
 }
 
@@ -12,9 +12,58 @@ export default function CreateTournament({
   onTournamentCreated,
   onBack,
 }: CreateTournamentProps) {
+  const [tournamentName, setTournamentName] = useState('');
   const [teams, setTeams] = useState<Team[]>([]);
   const [player1LastName, setPlayer1LastName] = useState('');
   const [player2LastName, setPlayer2LastName] = useState('');
+  const [autoTeamCount, setAutoTeamCount] = useState(8);
+
+  // Lista de apellidos comunes para generar aleatoriamente
+  const randomSurnames = [
+    'García', 'Rodríguez', 'López', 'Martínez', 'González', 'Pérez', 'Sánchez', 'Ramírez',
+    'Torres', 'Flores', 'Rivera', 'Morales', 'Cruz', 'Ortiz', 'Silva', 'Reyes',
+    'Moreno', 'Jiménez', 'Díaz', 'Romero', 'Herrera', 'Ruiz', 'Vargas', 'Mendoza',
+    'Castro', 'Fernández', 'Gutiérrez', 'Ramos', 'Alvarez', 'Molina', 'Navarro', 'Delgado',
+    'Vega', 'Rojas', 'Campos', 'Guerrero', 'Cortés', 'Paredes', 'Salazar', 'Vásquez',
+    'Acosta', 'Figueroa', 'Lara', 'Bravo', 'Miranda', 'Valenzuela', 'Tapia', 'Espinoza',
+    'Fuentes', 'Aguilar', 'Zúñiga', 'Cárdenas', 'Soto', 'Contreras', 'Valdez', 'Castillo',
+    'Carrasco', 'Córdova', 'Escobar', 'Ponce', 'Medina', 'Sepúlveda', 'Herrera', 'Riquelme',
+    'Araya', 'Leiva', 'Toro', 'Vergara', 'Maldonado', 'Bustos', 'Carvajal', 'Donoso',
+    'Farias', 'Gallardo', 'Henríquez', 'Ibarra', 'Jara', 'Klein', 'Lagos', 'Mansilla'
+  ];
+
+  const generateRandomTeams = () => {
+    if (autoTeamCount < 4 || autoTeamCount > 16) {
+      alert('El número de parejas debe estar entre 4 y 16');
+      return;
+    }
+
+    const shuffledSurnames = [...randomSurnames].sort(() => Math.random() - 0.5);
+    const newTeams: Team[] = [];
+
+    for (let i = 0; i < autoTeamCount; i++) {
+      const player1: Player = {
+        id: `auto-player-${Date.now()}-${i}-1`,
+        lastName: shuffledSurnames[i * 2],
+      };
+
+      const player2: Player = {
+        id: `auto-player-${Date.now()}-${i}-2`,
+        lastName: shuffledSurnames[i * 2 + 1],
+      };
+
+      const team: Team = {
+        id: `auto-team-${Date.now()}-${i}`,
+        player1,
+        player2,
+        name: `${player1.lastName} & ${player2.lastName}`,
+      };
+
+      newTeams.push(team);
+    }
+
+    setTeams(newTeams);
+  };
 
   const addTeam = () => {
     if (!player1LastName.trim() || !player2LastName.trim()) {
@@ -49,13 +98,18 @@ export default function CreateTournament({
   };
 
   const createTournament = () => {
+    if (!tournamentName.trim()) {
+      alert('Por favor ingresa el nombre del torneo');
+      return;
+    }
+    
     if (teams.length < 4) {
-      alert('Se necesitan al menos 4 equipos para crear un torneo');
+      alert('Se necesitan al menos 4 parejas para crear un torneo');
       return;
     }
 
-    TournamentService.createTournament(teams);
-    onTournamentCreated();
+    const tournament = TournamentService.createTournament(teams, tournamentName.trim());
+    onTournamentCreated(tournament.id);
   };
 
   return (
@@ -69,8 +123,51 @@ export default function CreateTournament({
       </div>
 
       <div className="create-tournament-content">
+        <div className="tournament-name-form">
+          <h3>Información del Torneo</h3>
+          <div className="tournament-name-input">
+            <div className="input-group">
+              <label htmlFor="tournamentName">Nombre del Torneo:</label>
+              <input
+                id="tournamentName"
+                type="text"
+                value={tournamentName}
+                onChange={(e) => setTournamentName(e.target.value)}
+                placeholder="Ej: Torneo de Verano 2024"
+                className="input"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="auto-team-form">
+          <h3>Generar Parejas Automáticamente</h3>
+          <div className="auto-team-inputs">
+            <div className="input-group">
+              <label htmlFor="autoTeamCount">Número de Parejas:</label>
+              <input
+                id="autoTeamCount"
+                type="number"
+                min="4"
+                max="16"
+                value={autoTeamCount}
+                onChange={(e) => setAutoTeamCount(parseInt(e.target.value) || 8)}
+                className="input"
+              />
+            </div>
+            
+            <button onClick={generateRandomTeams} className="btn btn-secondary">
+              <Users size={16} />
+              Generar {autoTeamCount} Parejas Aleatorias
+            </button>
+          </div>
+          <p className="info-text">
+            Esta opción generará automáticamente el número especificado de parejas con apellidos aleatorios.
+          </p>
+        </div>
+
         <div className="team-form">
-          <h3>Agregar Equipo</h3>
+          <h3>Agregar Pareja Manualmente</h3>
           <div className="team-inputs">
             <div className="input-group">
               <label htmlFor="player1">Apellido Jugador 1:</label>
@@ -98,15 +195,15 @@ export default function CreateTournament({
             
             <button onClick={addTeam} className="btn btn-primary">
               <Plus size={16} />
-              Agregar Equipo
+              Agregar Pareja
             </button>
           </div>
         </div>
 
         <div className="teams-list">
-          <h3>Equipos ({teams.length})</h3>
+          <h3>Parejas ({teams.length})</h3>
           {teams.length === 0 ? (
-            <p className="empty-teams">No hay equipos agregados</p>
+                          <p className="empty-teams">No hay parejas agregadas</p>
           ) : (
             <div className="teams-grid">
               {teams.map((team) => (
@@ -118,7 +215,7 @@ export default function CreateTournament({
                   <button
                     onClick={() => removeTeam(team.id)}
                     className="btn btn-danger btn-small"
-                    title="Eliminar equipo"
+                    title="Eliminar pareja"
                   >
                     <X size={14} />
                   </button>
@@ -131,60 +228,31 @@ export default function CreateTournament({
         <div className="create-tournament-actions">
           <button
             onClick={createTournament}
-            disabled={teams.length < 4}
+            disabled={teams.length < 4 || !tournamentName.trim()}
             className="btn btn-primary btn-large"
           >
-            Crear Torneo ({teams.length} equipos)
+            Crear Torneo y Configurar Grupos: {tournamentName.trim() || 'Sin nombre'} ({teams.length} parejas)
           </button>
           
-          {teams.length < 4 && (
+          {!tournamentName.trim() && (
             <p className="warning">
-              Se necesitan al menos 4 equipos para crear un torneo
+              Por favor ingresa el nombre del torneo
+            </p>
+          )}
+          {tournamentName.trim() && teams.length < 4 && (
+            <p className="warning">
+              Se necesitan al menos 4 parejas para crear un torneo
             </p>
           )}
           
-          {teams.length >= 4 && (
-            <div className="group-info">
-              <h4>Distribución de Grupos:</h4>
-              <ul>
-                {teams.length === 4 && (
-                  <li>1 grupo único con 4 equipos</li>
-                )}
-                {teams.length === 5 && (
-                  <li>1 grupo único con 5 equipos</li>
-                )}
-                {teams.length === 6 && (
-                  <li>2 grupos de 3 equipos cada uno</li>
-                )}
-                {teams.length === 7 && (
-                  <li>1 grupo de 3 equipos y 1 grupo de 4 equipos</li>
-                )}
-                {teams.length === 8 && (
-                  <li>2 grupos de 4 equipos cada uno</li>
-                )}
-                {teams.length > 8 && teams.length <= 12 && (
-                  <li>3 grupos de {Math.ceil(teams.length / 3)} equipos cada uno</li>
-                )}
-                {teams.length > 12 && (
-                  <li>4 grupos de {Math.ceil(teams.length / 4)} equipos cada uno</li>
-                )}
-              </ul>
-              <p className="info-text">
-                {teams.length === 4 
-                  ? 'Todos los equipos se enfrentarán entre sí y clasificarán a semifinales.'
-                  : teams.length === 5
-                  ? 'Todos los equipos se enfrentarán entre sí. Los 4 mejores clasificarán a semifinales.'
-                  : teams.length === 6
-                  ? 'Cada equipo jugará 2 partidos dentro de su grupo y 1 partido interzonal. Los 4 mejores clasificarán a cuartos de final.'
-                  : teams.length === 7
-                  ? 'Cada equipo jugará todos contra todos dentro de su grupo. Los 4 mejores clasificarán a cuartos de final.'
-                  : teams.length === 8
-                  ? 'Cada equipo jugará todos contra todos dentro de su grupo. Los 2 primeros de cada grupo clasificarán a cuartos de final.'
-                  : 'Todos los equipos se enfrentarán entre sí dentro de su grupo.'
-                }
-              </p>
-            </div>
-          )}
+                     {teams.length >= 4 && (
+             <div className="group-info">
+               <h4>Próximo Paso:</h4>
+               <p className="info-text">
+                 Después de crear el torneo, configurarás los grupos manualmente antes de iniciar las competencias.
+               </p>
+             </div>
+           )}
         </div>
       </div>
     </div>

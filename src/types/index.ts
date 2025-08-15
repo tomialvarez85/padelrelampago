@@ -49,4 +49,7 @@ export interface TeamStats {
   losses: number;
   totalMatches: number;
   winPercentage: number;
+  gamesFor: number;
+  gamesAgainst: number;
+  gamesDifference: number;
 } 

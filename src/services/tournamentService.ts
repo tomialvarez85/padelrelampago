@@ -12,10 +12,10 @@ export class TournamentService {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tournaments));
   }
 
-  static createTournament(teams: Team[]): Tournament {
+  static createTournament(teams: Team[], name?: string): Tournament {
     const tournament: Tournament = {
       id: Date.now().toString(),
-      name: `Torneo ${new Date().toLocaleDateString()}`,
+      name: name || `Torneo ${new Date().toLocaleDateString()}`,
       teams,
       groups: [],
       quarterfinals: [],
@@ -53,12 +53,12 @@ export class TournamentService {
     const tournament = tournaments[tournamentIndex];
     const shuffledTeams = [...tournament.teams].sort(() => Math.random() - 0.5);
     
-    // Crear grupos con mínimo 3 equipos por grupo
     const groups: Group[] = [];
     const totalTeams = shuffledTeams.length;
     
-    // Caso especial: 4 equipos - un solo grupo, todos clasifican a semifinales
+    // Implementar las reglas específicas según la cantidad de parejas
     if (totalTeams === 4) {
+      // Torneo de 4 parejas: Un grupo de cuatro parejas y pasan los primeros 2 a final
       const group: Group = {
         id: 'group-1',
         name: 'Grupo Único',
@@ -67,7 +67,7 @@ export class TournamentService {
       };
       groups.push(group);
     } else if (totalTeams === 5) {
-      // Caso especial: 5 equipos - un solo grupo, solo los 4 mejores clasifican
+      // Torneo de 5 parejas: Un grupo de 5 parejas y pasan 4 a semifinal
       const group: Group = {
         id: 'group-1',
         name: 'Grupo Único',
@@ -76,103 +76,284 @@ export class TournamentService {
       };
       groups.push(group);
     } else if (totalTeams === 6) {
-      // Caso especial: 6 equipos - 2 grupos de 3 equipos con partidos interzonales
-      const group1Teams = shuffledTeams.slice(0, 3);
-      const group2Teams = shuffledTeams.slice(3, 6);
-      
-      // Generar partidos dentro de cada grupo
-      const group1Matches = this.generateGroupMatches(group1Teams, 'group-1');
-      const group2Matches = this.generateGroupMatches(group2Teams, 'group-2');
-      
-      // Generar partidos interzonales (cada equipo del grupo 1 juega contra un equipo del grupo 2)
-      const interzonalMatches = this.generateInterzonalMatches(group1Teams, group2Teams);
-      
-      const group1: Group = {
+      // Torneo de 6 parejas: Un grupo de 6 parejas y pasan primeros 4 a semifinal
+      const group: Group = {
         id: 'group-1',
-        name: 'Grupo A',
-        teams: group1Teams,
-        matches: [...group1Matches, ...interzonalMatches.filter(m => group1Teams.some(team => team.id === m.team1.id))],
+        name: 'Grupo Único',
+        teams: shuffledTeams,
+        matches: this.generateGroupMatches(shuffledTeams, 'group-1'),
       };
-      
-      const group2: Group = {
-        id: 'group-2',
-        name: 'Grupo B',
-        teams: group2Teams,
-        matches: [...group2Matches, ...interzonalMatches.filter(m => group2Teams.some(team => team.id === m.team2.id))],
-      };
-      
-      groups.push(group1, group2);
+      groups.push(group);
     } else if (totalTeams === 7) {
-      // Caso especial: 7 equipos - 1 grupo de 3 equipos y 1 grupo de 4 equipos
-      const group1Teams = shuffledTeams.slice(0, 3);
-      const group2Teams = shuffledTeams.slice(3, 7);
-      
-      // Generar partidos dentro de cada grupo
-      const group1Matches = this.generateGroupMatches(group1Teams, 'group-1');
-      const group2Matches = this.generateGroupMatches(group2Teams, 'group-2');
+      // Torneo de 7 parejas: Un grupo de 4 parejas y un grupo de 3 parejas
+      const group1Teams = shuffledTeams.slice(0, 4);
+      const group2Teams = shuffledTeams.slice(4, 7);
       
       const group1: Group = {
         id: 'group-1',
         name: 'Grupo A',
         teams: group1Teams,
-        matches: group1Matches,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
       };
       
       const group2: Group = {
         id: 'group-2',
         name: 'Grupo B',
         teams: group2Teams,
-        matches: group2Matches,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
       };
       
       groups.push(group1, group2);
     } else if (totalTeams === 8) {
-      // Caso especial: 8 equipos - 2 grupos de 4 equipos cada uno
+      // Torneo de 8 parejas: 2 grupos de 4, pasan todos a 4tos de final
       const group1Teams = shuffledTeams.slice(0, 4);
       const group2Teams = shuffledTeams.slice(4, 8);
-      
-      // Generar partidos dentro de cada grupo
-      const group1Matches = this.generateGroupMatches(group1Teams, 'group-1');
-      const group2Matches = this.generateGroupMatches(group2Teams, 'group-2');
       
       const group1: Group = {
         id: 'group-1',
         name: 'Grupo A',
         teams: group1Teams,
-        matches: group1Matches,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
       };
       
       const group2: Group = {
         id: 'group-2',
         name: 'Grupo B',
         teams: group2Teams,
-        matches: group2Matches,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
       };
       
       groups.push(group1, group2);
+    } else if (totalTeams === 9) {
+      // Torneo de 9 parejas: Un grupo de 4 y uno de 5
+      const group1Teams = shuffledTeams.slice(0, 4);
+      const group2Teams = shuffledTeams.slice(4, 9);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      groups.push(group1, group2);
+    } else if (totalTeams === 10) {
+      // Torneo de 10 parejas: 2 grupos de 5, pasan los primeros 4 de cada grupo a 4tos de final
+      const group1Teams = shuffledTeams.slice(0, 5);
+      const group2Teams = shuffledTeams.slice(5, 10);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      groups.push(group1, group2);
+    } else if (totalTeams === 11) {
+      // Torneo de 11 parejas: Un grupo de 5 y uno de 6, pasan los primeros 4 de cada grupo a semifinal
+      const group1Teams = shuffledTeams.slice(0, 5);
+      const group2Teams = shuffledTeams.slice(5, 11);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      groups.push(group1, group2);
+    } else if (totalTeams === 12) {
+      // Torneo de 12 parejas: 3 grupos de 4 parejas, pasan a 4tos de final los 2 primeros de cada grupo y los dos mejores terceros
+      const group1Teams = shuffledTeams.slice(0, 4);
+      const group2Teams = shuffledTeams.slice(4, 8);
+      const group3Teams = shuffledTeams.slice(8, 12);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      const group3: Group = {
+        id: 'group-3',
+        name: 'Grupo C',
+        teams: group3Teams,
+        matches: this.generateGroupMatches(group3Teams, 'group-3'),
+      };
+      
+      groups.push(group1, group2, group3);
+    } else if (totalTeams === 13) {
+      // Torneo 13 parejas: 2 grupos de 4 y uno de 5. Pasan a 4tos los 2 primeros de cada grupo y los dos mejores 3eros
+      const group1Teams = shuffledTeams.slice(0, 4);
+      const group2Teams = shuffledTeams.slice(4, 8);
+      const group3Teams = shuffledTeams.slice(8, 13);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      const group3: Group = {
+        id: 'group-3',
+        name: 'Grupo C',
+        teams: group3Teams,
+        matches: this.generateGroupMatches(group3Teams, 'group-3'),
+      };
+      
+      groups.push(group1, group2, group3);
+    } else if (totalTeams === 14) {
+      // Torneo 14 parejas: 2 grupos de 4 y 2 grupos de 3 (juegan interzonal entre los grupos de 3)
+      const group1Teams = shuffledTeams.slice(0, 4);
+      const group2Teams = shuffledTeams.slice(4, 8);
+      const group3Teams = shuffledTeams.slice(8, 11);
+      const group4Teams = shuffledTeams.slice(11, 14);
+      
+      // Generar partidos interzonales entre grupos de 3
+      const interzonalMatches = this.generateInterzonalMatches(group3Teams, group4Teams);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      const group3: Group = {
+        id: 'group-3',
+        name: 'Grupo C',
+        teams: group3Teams,
+        matches: [...this.generateGroupMatches(group3Teams, 'group-3'), ...interzonalMatches.filter(m => group3Teams.some(team => team.id === m.team1.id))],
+      };
+      
+      const group4: Group = {
+        id: 'group-4',
+        name: 'Grupo D',
+        teams: group4Teams,
+        matches: [...this.generateGroupMatches(group4Teams, 'group-4'), ...interzonalMatches.filter(m => group4Teams.some(team => team.id === m.team2.id))],
+      };
+      
+      groups.push(group1, group2, group3, group4);
+    } else if (totalTeams === 15) {
+      // Torneo 15 parejas: 3 grupos de 5, pasan a 4tos los 2 primeros de cada grupo y los 2 mejores 3eros
+      const group1Teams = shuffledTeams.slice(0, 5);
+      const group2Teams = shuffledTeams.slice(5, 10);
+      const group3Teams = shuffledTeams.slice(10, 15);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      const group3: Group = {
+        id: 'group-3',
+        name: 'Grupo C',
+        teams: group3Teams,
+        matches: this.generateGroupMatches(group3Teams, 'group-3'),
+      };
+      
+      groups.push(group1, group2, group3);
+    } else if (totalTeams === 16) {
+      // Torneo 16 parejas: 4 grupos de 4, pasan a 4tos los dos primeros de cada grupo
+      const group1Teams = shuffledTeams.slice(0, 4);
+      const group2Teams = shuffledTeams.slice(4, 8);
+      const group3Teams = shuffledTeams.slice(8, 12);
+      const group4Teams = shuffledTeams.slice(12, 16);
+      
+      const group1: Group = {
+        id: 'group-1',
+        name: 'Grupo A',
+        teams: group1Teams,
+        matches: this.generateGroupMatches(group1Teams, 'group-1'),
+      };
+      
+      const group2: Group = {
+        id: 'group-2',
+        name: 'Grupo B',
+        teams: group2Teams,
+        matches: this.generateGroupMatches(group2Teams, 'group-2'),
+      };
+      
+      const group3: Group = {
+        id: 'group-3',
+        name: 'Grupo C',
+        teams: group3Teams,
+        matches: this.generateGroupMatches(group3Teams, 'group-3'),
+      };
+      
+      const group4: Group = {
+        id: 'group-4',
+        name: 'Grupo D',
+        teams: group4Teams,
+        matches: this.generateGroupMatches(group4Teams, 'group-4'),
+      };
+      
+      groups.push(group1, group2, group3, group4);
     } else {
-      // Calcular el número óptimo de grupos y equipos por grupo
+      // Para más de 16 equipos, usar distribución automática
       let numGroups: number;
       let teamsPerGroup: number;
       
-      if (totalTeams <= 8) {
-        // Para 8 equipos o menos: 2 grupos de 3-4 equipos
-        numGroups = 2;
-        teamsPerGroup = Math.ceil(totalTeams / numGroups);
-      } else if (totalTeams <= 12) {
-        // Para 9-12 equipos: 3 grupos de 3-4 equipos
-        numGroups = 3;
-        teamsPerGroup = Math.ceil(totalTeams / numGroups);
-      } else {
-        // Para más de 12 equipos: 4 grupos de 3-4 equipos
+      if (totalTeams <= 20) {
         numGroups = 4;
         teamsPerGroup = Math.ceil(totalTeams / numGroups);
-      }
-      
-      // Asegurar que no haya grupos con menos de 3 equipos
-      if (teamsPerGroup < 3) {
-        teamsPerGroup = 3;
-        numGroups = Math.ceil(totalTeams / teamsPerGroup);
+      } else {
+        numGroups = 5;
+        teamsPerGroup = Math.ceil(totalTeams / numGroups);
       }
       
       // Distribuir equipos en grupos
@@ -202,6 +383,41 @@ export class TournamentService {
         // Regenerar partidos del grupo
         groups[groupIndex].matches = this.generateGroupMatches(groups[groupIndex].teams, groups[groupIndex].id);
       }
+    }
+
+    tournament.groups = groups;
+    tournament.isStarted = true;
+    
+    tournaments[tournamentIndex] = tournament;
+    this.saveTournaments(tournaments);
+    
+    return tournament;
+  }
+
+  static startTournamentWithManualGroups(tournamentId: string, groups: Group[]): Tournament {
+    const tournaments = this.getStoredTournaments();
+    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
+    
+    if (tournamentIndex === -1) {
+      throw new Error('Tournament not found');
+    }
+
+    const tournament = tournaments[tournamentIndex];
+    
+    // Verificar que todos los equipos estén asignados
+    const assignedTeams = groups.flatMap(group => group.teams);
+    const allTeams = tournament.teams;
+    
+    if (assignedTeams.length !== allTeams.length) {
+      throw new Error('Todos los equipos deben estar asignados a un grupo');
+    }
+    
+    // Verificar que no haya equipos duplicados
+    const assignedTeamIds = assignedTeams.map(team => team.id);
+    const uniqueTeamIds = new Set(assignedTeamIds);
+    
+    if (assignedTeamIds.length !== uniqueTeamIds.size) {
+      throw new Error('No puede haber equipos duplicados en los grupos');
     }
 
     tournament.groups = groups;
@@ -313,21 +529,6 @@ export class TournamentService {
       tournament.isCompleted = true;
     }
 
-    // Verificar si se pueden generar los cuartos de final
-    if (this.canGenerateQuarterfinals(tournament)) {
-      tournament.quarterfinals = this.generateQuarterfinals(tournament);
-    }
-
-    // Verificar si se pueden generar las semifinales
-    if (this.canGenerateSemifinals(tournament)) {
-      tournament.semifinals = this.generateSemifinals(tournament);
-    }
-
-    // Verificar si se puede generar la final
-    if (this.canGenerateFinal(tournament)) {
-      tournament.final = this.generateFinal(tournament);
-    }
-
     tournaments[tournamentIndex] = tournament;
     this.saveTournaments(tournaments);
     
@@ -337,13 +538,14 @@ export class TournamentService {
   private static canGenerateQuarterfinals(tournament: Tournament): boolean {
     if (tournament.quarterfinals.length > 0) return false;
     
-    // Caso especial: 6, 7 u 8 equipos van directo a cuartos de final
-    if (tournament.teams.length === 6 || tournament.teams.length === 7 || tournament.teams.length === 8) {
-      return tournament.groups.every(group => 
-        group.matches.every(match => match.isCompleted)
-      );
+    const totalTeams = tournament.teams.length;
+    
+    // Los casos de 4, 5, 6 parejas van directo a semifinales, no generan cuartos de final
+    if (totalTeams === 4 || totalTeams === 5 || totalTeams === 6) {
+      return false;
     }
     
+    // Verificar que todos los partidos de grupos estén completados
     return tournament.groups.every(group => 
       group.matches.every(match => match.isCompleted)
     );
@@ -352,13 +554,16 @@ export class TournamentService {
   private static canGenerateSemifinals(tournament: Tournament): boolean {
     if (tournament.semifinals.length > 0) return false;
     
-    // Caso especial: 4 o 5 equipos van directo a semifinales
-    if (tournament.teams.length === 4 || tournament.teams.length === 5) {
+    const totalTeams = tournament.teams.length;
+    
+    // Casos que van directo a semifinales desde grupos
+    if (totalTeams === 4 || totalTeams === 5 || totalTeams === 6 || totalTeams === 11) {
       return tournament.groups.every(group => 
         group.matches.every(match => match.isCompleted)
       );
     }
     
+    // Casos que van a cuartos de final primero
     return tournament.quarterfinals.length > 0 && 
            tournament.quarterfinals.every(match => match.isCompleted);
   }
@@ -366,57 +571,202 @@ export class TournamentService {
   private static canGenerateFinal(tournament: Tournament): boolean {
     if (tournament.final) return false;
     
+    const totalTeams = tournament.teams.length;
+    
+    if (totalTeams === 4) {
+      // Torneo de 4 parejas: va directo a final desde grupos
+      return tournament.groups.every(group => 
+        group.matches.every(match => match.isCompleted)
+      );
+    }
+    
     return tournament.semifinals.length > 0 && 
            tournament.semifinals.every(match => match.isCompleted);
   }
 
   private static generateQuarterfinals(tournament: Tournament): Match[] {
-    let quarterfinalists: Team[];
-    
-    // Caso especial: 6, 7 u 8 equipos van directo a cuartos de final
-    if (tournament.teams.length === 6 || tournament.teams.length === 7 || tournament.teams.length === 8) {
-      if (tournament.teams.length === 8) {
-        // 8 equipos: los 2 mejores de cada grupo clasifican
-        quarterfinalists = [];
-        for (const group of tournament.groups) {
-          const groupStats = this.calculateGroupStats(group);
-          const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
-          quarterfinalists.push(...sortedTeams.slice(0, 2).map(stat => 
-            group.teams.find(team => team.id === stat.teamId)!
-          ));
-        }
-      } else {
-        // 6 o 7 equipos: los 4 mejores de ambos grupos clasifican
-        const allTeams = tournament.groups.flatMap(group => group.teams);
-        const allStats = this.calculateOverallStats(tournament);
-        const sortedTeams = allStats.sort((a, b) => b.wins - a.wins);
-        quarterfinalists = sortedTeams.slice(0, 4).map(stat => 
-          allTeams.find(team => team.id === stat.teamId)!
-        );
-      }
-    } else {
-      // Obtener los 2 mejores equipos de cada grupo
-      quarterfinalists = [];
-      for (const group of tournament.groups) {
-        const groupStats = this.calculateGroupStats(group);
-        const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
-        quarterfinalists.push(...sortedTeams.slice(0, 2).map(stat => 
-          group.teams.find(team => team.id === stat.teamId)!
-        ));
-      }
-    }
-
+    const totalTeams = tournament.teams.length;
     const matches: Match[] = [];
-    for (let i = 0; i < quarterfinalists.length; i += 2) {
-      if (i + 1 < quarterfinalists.length) {
-        const match: Match = {
-          id: `quarterfinal-${i / 2 + 1}`,
-          team1: quarterfinalists[i],
-          team2: quarterfinalists[i + 1],
+    
+    // Obtener estadísticas de todos los grupos
+    const groupStats: { [groupId: string]: Team[] } = {};
+    for (const group of tournament.groups) {
+      const stats = this.calculateGroupStats(group);
+      const sortedTeams = stats.map(stat => 
+        group.teams.find(team => team.id === stat.teamId)!
+      );
+      groupStats[group.id] = sortedTeams;
+    }
+    
+    const groupIds = Object.keys(groupStats);
+    
+    // Los casos de 4, 5, 6 parejas van directo a semifinales, no generan cuartos de final
+    if (totalTeams === 4 || totalTeams === 5 || totalTeams === 6) {
+      return [];
+    }
+    
+    if (totalTeams === 7) {
+      // 7 parejas: Grupo A (4 equipos) - 1er pasa a semifinal, 2do, 3ro y 4to van a cuartos
+      // Grupo B (3 equipos) - todos van a cuartos
+      // Los del mismo grupo NO se enfrentan entre sí
+      const groupA = groupStats[groupIds[0]];
+      const groupB = groupStats[groupIds[1]];
+      
+      // 2do del grupo A vs 1ro del grupo B
+      matches.push({
+        id: 'quarterfinal-1',
+        team1: groupA[1], // 2do grupo A
+        team2: groupB[0], // 1ro grupo B
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // 3ro del grupo A vs 2do del grupo B
+      matches.push({
+        id: 'quarterfinal-2',
+        team1: groupA[2], // 3ro grupo A
+        team2: groupB[1], // 2do grupo B
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // 4to del grupo A vs 3ro del grupo B
+      matches.push({
+        id: 'quarterfinal-3',
+        team1: groupA[3], // 4to grupo A
+        team2: groupB[2], // 3ro grupo B
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+    } else if (totalTeams === 8 || totalTeams === 9 || totalTeams === 10 || totalTeams === 11) {
+      // 8-11 parejas: 1ro de un grupo vs 4to del otro, 2do vs 3ro del otro grupo
+      const group1 = groupStats[groupIds[0]];
+      const group2 = groupStats[groupIds[1]];
+      
+      // 1ro grupo 1 vs 4to grupo 2
+      matches.push({
+        id: 'quarterfinal-1',
+        team1: group1[0], // 1ro grupo 1
+        team2: group2[3], // 4to grupo 2
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // 2do grupo 1 vs 3ro grupo 2
+      matches.push({
+        id: 'quarterfinal-2',
+        team1: group1[1], // 2do grupo 1
+        team2: group2[2], // 3ro grupo 2
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // 1ro grupo 2 vs 4to grupo 1
+      matches.push({
+        id: 'quarterfinal-3',
+        team1: group2[0], // 1ro grupo 2
+        team2: group1[3], // 4to grupo 1
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // 2do grupo 2 vs 3ro grupo 1
+      matches.push({
+        id: 'quarterfinal-4',
+        team1: group2[1], // 2do grupo 2
+        team2: group1[2], // 3ro grupo 1
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+    } else if (totalTeams === 12 || totalTeams === 13 || totalTeams === 15) {
+      // 12, 13, 15 parejas: Dos primeros juegan contra los 2 terceros, 
+      // el primero faltante juega contra un segundo y los otros dos segundos juegan entre sí
+      // Todos los cruces tienen que ser entre parejas de distintos grupos
+      
+      // Obtener todos los primeros, segundos y terceros
+      const firstPlaces: Team[] = [];
+      const secondPlaces: Team[] = [];
+      const thirdPlaces: Team[] = [];
+      
+      for (const groupId of groupIds) {
+        const group = groupStats[groupId];
+        if (group.length >= 1) firstPlaces.push(group[0]);
+        if (group.length >= 2) secondPlaces.push(group[1]);
+        if (group.length >= 3) thirdPlaces.push(group[2]);
+      }
+      
+      // Ordenar terceros por estadísticas para obtener los mejores
+      const thirdPlaceStats: { team: Team; stats: any }[] = [];
+      for (const group of tournament.groups) {
+        const stats = this.calculateGroupStats(group);
+        if (stats.length >= 3) {
+          thirdPlaceStats.push({ team: groupStats[group.id][2], stats: stats[2] });
+        }
+      }
+      const bestThirdPlaces = thirdPlaceStats
+        .sort((a, b) => b.stats.wins - a.stats.wins)
+        .slice(0, 2)
+        .map(item => item.team);
+      
+      // Emparejar: 2 primeros vs 2 mejores terceros
+      matches.push({
+        id: 'quarterfinal-1',
+        team1: firstPlaces[0],
+        team2: bestThirdPlaces[0],
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      matches.push({
+        id: 'quarterfinal-2',
+        team1: firstPlaces[1],
+        team2: bestThirdPlaces[1],
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // El primer faltante vs un segundo
+      matches.push({
+        id: 'quarterfinal-3',
+        team1: firstPlaces[2],
+        team2: secondPlaces[0],
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+      // Los otros dos segundos juegan entre sí
+      matches.push({
+        id: 'quarterfinal-4',
+        team1: secondPlaces[1],
+        team2: secondPlaces[2],
+        isCompleted: false,
+        round: 'quarterfinal',
+      });
+      
+    } else if (totalTeams === 14 || totalTeams === 16) {
+      // 14, 16 parejas: Los primeros juegan contra los segundos
+      // Siempre los cruces tienen que ser de diferentes grupos
+      
+      const firstPlaces: Team[] = [];
+      const secondPlaces: Team[] = [];
+      
+      for (const groupId of groupIds) {
+        const group = groupStats[groupId];
+        if (group.length >= 1) firstPlaces.push(group[0]);
+        if (group.length >= 2) secondPlaces.push(group[1]);
+      }
+      
+      // Emparejar primeros vs segundos de diferentes grupos
+      for (let i = 0; i < firstPlaces.length; i++) {
+        matches.push({
+          id: `quarterfinal-${i + 1}`,
+          team1: firstPlaces[i],
+          team2: secondPlaces[i],
           isCompleted: false,
           round: 'quarterfinal',
-        };
-        matches.push(match);
+        });
       }
     }
 
@@ -424,44 +774,114 @@ export class TournamentService {
   }
 
   private static generateSemifinals(tournament: Tournament): Match[] {
-    let semifinalists: Team[];
+    const totalTeams = tournament.teams.length;
+    const matches: Match[] = [];
     
-    // Caso especial: 4 o 5 equipos van directo a semifinales
-    if (tournament.teams.length === 4 || tournament.teams.length === 5) {
-      // Todos los equipos (4) o los 4 mejores (5) clasifican a semifinales
+    if (totalTeams === 4) {
+      // Torneo de 4 parejas: pasan los primeros 2 a final (no hay semifinales, van directo a final)
+      return [];
+      
+    } else if (totalTeams === 5 || totalTeams === 6) {
+      // 5-6 parejas: van directo a semifinales desde grupos
+      // Obtener las parejas clasificadas del grupo único
       const group = tournament.groups[0];
       const groupStats = this.calculateGroupStats(group);
-      const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
+      const sortedTeams = groupStats.map(stat => 
+        group.teams.find(team => team.id === stat.teamId)!
+      );
       
-      if (tournament.teams.length === 4) {
-        // 4 equipos: todos clasifican
-        semifinalists = sortedTeams.map(stat => 
-          group.teams.find(team => team.id === stat.teamId)!
-        );
-      } else {
-        // 5 equipos: solo los 4 mejores clasifican
-        semifinalists = sortedTeams.slice(0, 4).map(stat => 
-          group.teams.find(team => team.id === stat.teamId)!
-        );
-      }
-    } else {
-      // Caso normal: semifinalistas vienen de cuartos de final
-      semifinalists = tournament.quarterfinals
+      // Para 5 parejas: pasan 4 a semifinal (1ro vs 4to, 2do vs 3ro)
+      // Para 6 parejas: pasan 4 a semifinal (1ro vs 4to, 2do vs 3ro)
+      const semifinalists = sortedTeams.slice(0, 4);
+      
+      // Crear semifinales: 1ro vs 4to, 2do vs 3ro
+      matches.push({
+        id: 'semifinal-1',
+        team1: semifinalists[0], // 1ro
+        team2: semifinalists[3], // 4to
+        isCompleted: false,
+        round: 'semifinal',
+      });
+      
+      matches.push({
+        id: 'semifinal-2',
+        team1: semifinalists[1], // 2do
+        team2: semifinalists[2], // 3ro
+        isCompleted: false,
+        round: 'semifinal',
+      });
+      
+    } else if (totalTeams === 7) {
+      // 7 parejas: 1er del grupo A pasa directo a semifinal + ganadores de cuartos
+      const groupA = tournament.groups.find(g => g.name === 'Grupo A')!;
+      const groupAStats = this.calculateGroupStats(groupA);
+      const sortedGroupA = groupAStats.sort((a, b) => b.wins - a.wins);
+      const groupAFirst = groupA.teams.find(team => team.id === sortedGroupA[0].teamId)!;
+      
+      // Los ganadores de cuartos de final
+      const quarterfinalWinners = tournament.quarterfinals
         .filter(match => match.winner)
         .map(match => match.winner!);
-    }
-
-    const matches: Match[] = [];
-    for (let i = 0; i < semifinalists.length; i += 2) {
-      if (i + 1 < semifinalists.length) {
-        const match: Match = {
-          id: `semifinal-${i / 2 + 1}`,
-          team1: semifinalists[i],
-          team2: semifinalists[i + 1],
+      
+      // Crear semifinales: 1er grupo A vs ganador cuartos, otros dos ganadores entre sí
+      matches.push({
+        id: 'semifinal-1',
+        team1: groupAFirst,
+        team2: quarterfinalWinners[0],
+        isCompleted: false,
+        round: 'semifinal',
+      });
+      
+      if (quarterfinalWinners.length >= 2) {
+        matches.push({
+          id: 'semifinal-2',
+          team1: quarterfinalWinners[1],
+          team2: quarterfinalWinners[2],
           isCompleted: false,
           round: 'semifinal',
-        };
-        matches.push(match);
+        });
+      }
+      
+    } else if (totalTeams === 11) {
+      // 11 parejas: pasan los primeros 4 de cada grupo a semifinal
+      const semifinalists: Team[] = [];
+      for (const group of tournament.groups) {
+        const groupStats = this.calculateGroupStats(group);
+        const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
+        semifinalists.push(...sortedTeams.slice(0, 4).map(stat => 
+          group.teams.find(team => team.id === stat.teamId)!
+        ));
+      }
+      
+      // Crear semifinales
+      for (let i = 0; i < semifinalists.length; i += 2) {
+        if (i + 1 < semifinalists.length) {
+          matches.push({
+            id: `semifinal-${i / 2 + 1}`,
+            team1: semifinalists[i],
+            team2: semifinalists[i + 1],
+            isCompleted: false,
+            round: 'semifinal',
+          });
+        }
+      }
+      
+    } else {
+      // Caso normal: semifinalistas vienen de cuartos de final
+      const quarterfinalWinners = tournament.quarterfinals
+        .filter(match => match.winner)
+        .map(match => match.winner!);
+      
+      for (let i = 0; i < quarterfinalWinners.length; i += 2) {
+        if (i + 1 < quarterfinalWinners.length) {
+          matches.push({
+            id: `semifinal-${i / 2 + 1}`,
+            team1: quarterfinalWinners[i],
+            team2: quarterfinalWinners[i + 1],
+            isCompleted: false,
+            round: 'semifinal',
+          });
+        }
       }
     }
 
@@ -469,9 +889,23 @@ export class TournamentService {
   }
 
   private static generateFinal(tournament: Tournament): Match {
-    const finalists = tournament.semifinals
-      .filter(match => match.winner)
-      .map(match => match.winner!);
+    let finalists: Team[];
+    const totalTeams = tournament.teams.length;
+    
+    if (totalTeams === 4) {
+      // Torneo de 4 parejas: los 2 mejores del grupo van a final
+      const group = tournament.groups[0];
+      const groupStats = this.calculateGroupStats(group);
+      const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
+      finalists = sortedTeams.slice(0, 2).map(stat => 
+        group.teams.find(team => team.id === stat.teamId)!
+      );
+    } else {
+      // Caso normal: finalistas vienen de semifinales
+      finalists = tournament.semifinals
+        .filter(match => match.winner)
+        .map(match => match.winner!);
+    }
 
     return {
       id: 'final',
@@ -494,14 +928,23 @@ export class TournamentService {
         losses: 0,
         totalMatches: 0,
         winPercentage: 0,
+        gamesFor: 0,
+        gamesAgainst: 0,
+        gamesDifference: 0,
       };
     }
 
     // Calcular estadísticas
     for (const match of group.matches) {
-      if (match.isCompleted && match.winner) {
+      if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
         stats[match.team1.id].totalMatches++;
         stats[match.team2.id].totalMatches++;
+        
+        // Sumar games
+        stats[match.team1.id].gamesFor += match.team1Score;
+        stats[match.team1.id].gamesAgainst += match.team2Score;
+        stats[match.team2.id].gamesFor += match.team2Score;
+        stats[match.team2.id].gamesAgainst += match.team1Score;
         
         if (match.winner.id === match.team1.id) {
           stats[match.team1.id].wins++;
@@ -513,14 +956,29 @@ export class TournamentService {
       }
     }
 
-    // Calcular porcentaje de victorias
+    // Calcular porcentaje de victorias y diferencia de games
     Object.values(stats).forEach(stat => {
       stat.winPercentage = stat.totalMatches > 0 
         ? (stat.wins / stat.totalMatches) * 100 
         : 0;
+      stat.gamesDifference = stat.gamesFor - stat.gamesAgainst;
     });
 
-    return Object.values(stats);
+    // Ordenar por criterios de clasificación: victorias, diferencia de games, games a favor
+    return Object.values(stats).sort((a, b) => {
+      // 1er criterio: Victorias
+      if (b.wins !== a.wins) {
+        return b.wins - a.wins;
+      }
+      
+      // 2do criterio: Diferencia de games
+      if (b.gamesDifference !== a.gamesDifference) {
+        return b.gamesDifference - a.gamesDifference;
+      }
+      
+      // 3er criterio: Games a favor
+      return b.gamesFor - a.gamesFor;
+    });
   }
 
   private static calculateOverallStats(tournament: Tournament): TeamStats[] {
@@ -535,15 +993,24 @@ export class TournamentService {
         losses: 0,
         totalMatches: 0,
         winPercentage: 0,
+        gamesFor: 0,
+        gamesAgainst: 0,
+        gamesDifference: 0,
       };
     }
 
     // Calcular estadísticas de todos los partidos de todos los grupos
     for (const group of tournament.groups) {
       for (const match of group.matches) {
-        if (match.isCompleted && match.winner) {
+        if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
           stats[match.team1.id].totalMatches++;
           stats[match.team2.id].totalMatches++;
+          
+          // Sumar games
+          stats[match.team1.id].gamesFor += match.team1Score;
+          stats[match.team1.id].gamesAgainst += match.team2Score;
+          stats[match.team2.id].gamesFor += match.team2Score;
+          stats[match.team2.id].gamesAgainst += match.team1Score;
           
           if (match.winner.id === match.team1.id) {
             stats[match.team1.id].wins++;
@@ -556,14 +1023,29 @@ export class TournamentService {
       }
     }
 
-    // Calcular porcentaje de victorias
+    // Calcular porcentaje de victorias y diferencia de games
     Object.values(stats).forEach(stat => {
       stat.winPercentage = stat.totalMatches > 0 
         ? (stat.wins / stat.totalMatches) * 100 
         : 0;
+      stat.gamesDifference = stat.gamesFor - stat.gamesAgainst;
     });
 
-    return Object.values(stats);
+    // Ordenar por criterios de clasificación: victorias, diferencia de games, games a favor
+    return Object.values(stats).sort((a, b) => {
+      // 1er criterio: Victorias
+      if (b.wins !== a.wins) {
+        return b.wins - a.wins;
+      }
+      
+      // 2do criterio: Diferencia de games
+      if (b.gamesDifference !== a.gamesDifference) {
+        return b.gamesDifference - a.gamesDifference;
+      }
+      
+      // 3er criterio: Games a favor
+      return b.gamesFor - a.gamesFor;
+    });
   }
 
   static getTeamStats(tournamentId: string): TeamStats[] {
@@ -581,15 +1063,24 @@ export class TournamentService {
         losses: 0,
         totalMatches: 0,
         winPercentage: 0,
+        gamesFor: 0,
+        gamesAgainst: 0,
+        gamesDifference: 0,
       };
     }
 
     // Contar partidos de grupos
     for (const group of tournament.groups) {
       for (const match of group.matches) {
-        if (match.isCompleted && match.winner) {
+        if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
           stats[match.team1.id].totalMatches++;
           stats[match.team2.id].totalMatches++;
+          
+          // Sumar games
+          stats[match.team1.id].gamesFor += match.team1Score;
+          stats[match.team1.id].gamesAgainst += match.team2Score;
+          stats[match.team2.id].gamesFor += match.team2Score;
+          stats[match.team2.id].gamesAgainst += match.team1Score;
           
           if (match.winner.id === match.team1.id) {
             stats[match.team1.id].wins++;
@@ -610,9 +1101,15 @@ export class TournamentService {
     ];
 
     for (const match of eliminationMatches) {
-      if (match.isCompleted && match.winner) {
+      if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
         stats[match.team1.id].totalMatches++;
         stats[match.team2.id].totalMatches++;
+        
+        // Sumar games
+        stats[match.team1.id].gamesFor += match.team1Score;
+        stats[match.team1.id].gamesAgainst += match.team2Score;
+        stats[match.team2.id].gamesFor += match.team2Score;
+        stats[match.team2.id].gamesAgainst += match.team1Score;
         
         if (match.winner.id === match.team1.id) {
           stats[match.team1.id].wins++;
@@ -624,19 +1121,243 @@ export class TournamentService {
       }
     }
 
-    // Calcular porcentaje de victorias
+    // Calcular porcentaje de victorias y diferencia de games
     Object.values(stats).forEach(stat => {
       stat.winPercentage = stat.totalMatches > 0 
         ? (stat.wins / stat.totalMatches) * 100 
         : 0;
+      stat.gamesDifference = stat.gamesFor - stat.gamesAgainst;
     });
 
-    return Object.values(stats).sort((a, b) => b.winPercentage - a.winPercentage);
+    // Ordenar por criterios de clasificación: victorias, diferencia de games, games a favor
+    return Object.values(stats).sort((a, b) => {
+      // 1er criterio: Victorias
+      if (b.wins !== a.wins) {
+        return b.wins - a.wins;
+      }
+      
+      // 2do criterio: Diferencia de games
+      if (b.gamesDifference !== a.gamesDifference) {
+        return b.gamesDifference - a.gamesDifference;
+      }
+      
+      // 3er criterio: Games a favor
+      return b.gamesFor - a.gamesFor;
+    });
+  }
+
+  static getGroupStats(tournamentId: string): { [groupId: string]: TeamStats[] } {
+    const tournament = this.getTournament(tournamentId);
+    if (!tournament) return {};
+
+    const groupStats: { [groupId: string]: TeamStats[] } = {};
+    
+    for (const group of tournament.groups) {
+      groupStats[group.id] = this.calculateGroupStats(group);
+    }
+
+    return groupStats;
   }
 
   static deleteTournament(tournamentId: string): void {
     const tournaments = this.getStoredTournaments();
     const filteredTournaments = tournaments.filter(t => t.id !== tournamentId);
     this.saveTournaments(filteredTournaments);
+  }
+
+  // Funciones para generar manualmente las rondas
+  static generateNextRound(tournamentId: string): Tournament {
+    const tournaments = this.getStoredTournaments();
+    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
+    
+    if (tournamentIndex === -1) {
+      throw new Error('Tournament not found');
+    }
+
+    const tournament = tournaments[tournamentIndex];
+    
+    // Verificar qué ronda se puede generar
+    if (this.canGenerateQuarterfinals(tournament)) {
+      tournament.quarterfinals = this.generateQuarterfinals(tournament);
+    } else if (this.canGenerateSemifinals(tournament)) {
+      tournament.semifinals = this.generateSemifinals(tournament);
+    } else if (this.canGenerateFinal(tournament)) {
+      tournament.final = this.generateFinal(tournament);
+    } else {
+      throw new Error('No se puede generar la siguiente ronda en este momento');
+    }
+
+    tournaments[tournamentIndex] = tournament;
+    this.saveTournaments(tournaments);
+    
+    return tournament;
+  }
+
+  static canGenerateNextRound(tournamentId: string): { canGenerate: boolean; nextRound: string } {
+    const tournament = this.getTournament(tournamentId);
+    if (!tournament) {
+      return { canGenerate: false, nextRound: '' };
+    }
+
+    if (this.canGenerateQuarterfinals(tournament)) {
+      return { canGenerate: true, nextRound: 'Cuartos de Final' };
+    } else if (this.canGenerateSemifinals(tournament)) {
+      return { canGenerate: true, nextRound: 'Semifinales' };
+    } else if (this.canGenerateFinal(tournament)) {
+      return { canGenerate: true, nextRound: 'Final' };
+    }
+
+    return { canGenerate: false, nextRound: '' };
+  }
+
+  // Función para rellenar resultados aleatorios
+  static fillRandomResults(tournamentId: string): Tournament {
+    const tournaments = this.getStoredTournaments();
+    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
+    
+    if (tournamentIndex === -1) {
+      throw new Error('Tournament not found');
+    }
+
+    const tournament = tournaments[tournamentIndex];
+    
+    // Función auxiliar para generar resultado aleatorio
+    const generateRandomScore = () => {
+      // Generar scores típicos de pádel (6-0, 6-1, 6-2, 6-3, 6-4, 7-5, 7-6, etc.)
+      const scores = [6, 7];
+      const team1Score = scores[Math.floor(Math.random() * scores.length)];
+      let team2Score;
+      
+      if (team1Score === 6) {
+        team2Score = Math.floor(Math.random() * 6); // 0-5
+      } else {
+        team2Score = Math.floor(Math.random() * 7); // 0-6
+      }
+      
+      return { team1Score, team2Score };
+    };
+
+    // Rellenar resultados de grupos
+    for (const group of tournament.groups) {
+      for (const match of group.matches) {
+        if (!match.isCompleted) {
+          const { team1Score, team2Score } = generateRandomScore();
+          match.team1Score = team1Score;
+          match.team2Score = team2Score;
+          match.winner = team1Score > team2Score ? match.team1 : match.team2;
+          match.isCompleted = true;
+        }
+      }
+    }
+
+    // Rellenar resultados de cuartos de final
+    for (const match of tournament.quarterfinals) {
+      if (!match.isCompleted) {
+        const { team1Score, team2Score } = generateRandomScore();
+        match.team1Score = team1Score;
+        match.team2Score = team2Score;
+        match.winner = team1Score > team2Score ? match.team1 : match.team2;
+        match.isCompleted = true;
+      }
+    }
+
+    // Rellenar resultados de semifinales
+    for (const match of tournament.semifinals) {
+      if (!match.isCompleted) {
+        const { team1Score, team2Score } = generateRandomScore();
+        match.team1Score = team1Score;
+        match.team2Score = team2Score;
+        match.winner = team1Score > team2Score ? match.team1 : match.team2;
+        match.isCompleted = true;
+      }
+    }
+
+    // Rellenar resultado de final
+    if (tournament.final && !tournament.final.isCompleted) {
+      const { team1Score, team2Score } = generateRandomScore();
+      tournament.final.team1Score = team1Score;
+      tournament.final.team2Score = team2Score;
+      tournament.final.winner = team1Score > team2Score ? tournament.final.team1 : tournament.final.team2;
+      tournament.final.isCompleted = true;
+      tournament.isCompleted = true;
+    }
+
+    tournaments[tournamentIndex] = tournament;
+    this.saveTournaments(tournaments);
+    
+    return tournament;
+  }
+
+  // Función para rellenar solo los partidos pendientes de una ronda específica
+  static fillRandomResultsForRound(tournamentId: string, round: 'groups' | 'quarterfinals' | 'semifinals' | 'final'): Tournament {
+    const tournaments = this.getStoredTournaments();
+    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
+    
+    if (tournamentIndex === -1) {
+      throw new Error('Tournament not found');
+    }
+
+    const tournament = tournaments[tournamentIndex];
+    
+    // Función auxiliar para generar resultado aleatorio
+    const generateRandomScore = () => {
+      const scores = [6, 7];
+      const team1Score = scores[Math.floor(Math.random() * scores.length)];
+      let team2Score;
+      
+      if (team1Score === 6) {
+        team2Score = Math.floor(Math.random() * 6);
+      } else {
+        team2Score = Math.floor(Math.random() * 7);
+      }
+      
+      return { team1Score, team2Score };
+    };
+
+    if (round === 'groups') {
+      for (const group of tournament.groups) {
+        for (const match of group.matches) {
+          if (!match.isCompleted) {
+            const { team1Score, team2Score } = generateRandomScore();
+            match.team1Score = team1Score;
+            match.team2Score = team2Score;
+            match.winner = team1Score > team2Score ? match.team1 : match.team2;
+            match.isCompleted = true;
+          }
+        }
+      }
+    } else if (round === 'quarterfinals') {
+      for (const match of tournament.quarterfinals) {
+        if (!match.isCompleted) {
+          const { team1Score, team2Score } = generateRandomScore();
+          match.team1Score = team1Score;
+          match.team2Score = team2Score;
+          match.winner = team1Score > team2Score ? match.team1 : match.team2;
+          match.isCompleted = true;
+        }
+      }
+    } else if (round === 'semifinals') {
+      for (const match of tournament.semifinals) {
+        if (!match.isCompleted) {
+          const { team1Score, team2Score } = generateRandomScore();
+          match.team1Score = team1Score;
+          match.team2Score = team2Score;
+          match.winner = team1Score > team2Score ? match.team1 : match.team2;
+          match.isCompleted = true;
+        }
+      }
+    } else if (round === 'final' && tournament.final && !tournament.final.isCompleted) {
+      const { team1Score, team2Score } = generateRandomScore();
+      tournament.final.team1Score = team1Score;
+      tournament.final.team2Score = team2Score;
+      tournament.final.winner = team1Score > team2Score ? tournament.final.team1 : tournament.final.team2;
+      tournament.final.isCompleted = true;
+      tournament.isCompleted = true;
+    }
+
+    tournaments[tournamentIndex] = tournament;
+    this.saveTournaments(tournaments);
+    
+    return tournament;
   }
 } 

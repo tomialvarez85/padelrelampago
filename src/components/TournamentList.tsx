@@ -60,7 +60,7 @@ export default function TournamentList({
               </div>
               
               <div className="tournament-card-body">
-                <p><strong>Equipos:</strong> {tournament.teams.length}</p>
+                <p><strong>Parejas:</strong> {tournament.teams.length}</p>
                 <p><strong>Creado:</strong> {new Date(tournament.createdAt).toLocaleDateString()}</p>
               </div>
 

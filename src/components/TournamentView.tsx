@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
-import type { Tournament } from '../types';
-import { ArrowLeft, Play, Trophy, BarChart3 } from 'lucide-react';
+import type { Tournament, Group } from '../types';
+import { ArrowLeft, Trophy, BarChart3, Users } from 'lucide-react';
 import MatchCard from './MatchCard';
 import GroupView from './GroupView';
 import BracketView from './BracketView';
 import StatsView from './StatsView';
+import ManualGroupSetup from './ManualGroupSetup';
 
 interface TournamentViewProps {
   tournament: Tournament;
@@ -13,7 +14,7 @@ interface TournamentViewProps {
   onTournamentUpdated: () => void;
 }
 
-type View = 'overview' | 'groups' | 'bracket' | 'stats';
+type View = 'overview' | 'groups' | 'bracket' | 'stats' | 'manual-setup';
 
 export default function TournamentView({
   tournament,
@@ -22,9 +23,13 @@ export default function TournamentView({
 }: TournamentViewProps) {
   const [view, setView] = useState<View>('overview');
 
-  const handleStartTournament = () => {
-    TournamentService.startTournament(tournament.id);
-    onTournamentUpdated();
+  const handleManualGroupsCreated = (groups: Group[]) => {
+    try {
+      TournamentService.startTournamentWithManualGroups(tournament.id, groups);
+      onTournamentUpdated();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error al crear los grupos');
+    }
   };
 
   const handleMatchResult = (
@@ -34,6 +39,37 @@ export default function TournamentView({
   ) => {
     TournamentService.updateMatchResult(tournament.id, matchId, team1Score, team2Score);
     onTournamentUpdated();
+  };
+
+  const handleGenerateNextRound = () => {
+    try {
+      TournamentService.generateNextRound(tournament.id);
+      onTournamentUpdated();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error al generar la siguiente ronda');
+    }
+  };
+
+  const getNextRoundInfo = () => {
+    return TournamentService.canGenerateNextRound(tournament.id);
+  };
+
+  const handleFillRandomResults = () => {
+    try {
+      TournamentService.fillRandomResults(tournament.id);
+      onTournamentUpdated();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error al rellenar resultados aleatorios');
+    }
+  };
+
+  const handleFillRandomResultsForRound = (round: 'groups' | 'quarterfinals' | 'semifinals' | 'final') => {
+    try {
+      TournamentService.fillRandomResultsForRound(tournament.id, round);
+      onTournamentUpdated();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error al rellenar resultados aleatorios');
+    }
   };
 
   const getCompletedMatchesCount = () => {
@@ -78,7 +114,7 @@ export default function TournamentView({
         <div className="tournament-info">
           <h2>{tournament.name}</h2>
           <div className="tournament-stats">
-            <span>{tournament.teams.length} equipos</span>
+            <span>{tournament.teams.length} parejas</span>
             <span>•</span>
             <span>{getCompletedMatchesCount()}/{getTotalMatchesCount()} partidos</span>
             {tournament.isCompleted && (
@@ -94,12 +130,17 @@ export default function TournamentView({
       {!tournament.isStarted ? (
         <div className="tournament-not-started">
           <div className="start-tournament-card">
-            <h3>Iniciar Torneo</h3>
-            <p>El torneo está listo para comenzar. Se crearán grupos aleatorios y se generarán los partidos.</p>
-            <button onClick={handleStartTournament} className="btn btn-primary btn-large">
-              <Play size={20} />
-              Iniciar Torneo
-            </button>
+            <h3>Configurar Grupos</h3>
+            <p>El torneo está creado pero necesita que configures los grupos antes de iniciar las competencias.</p>
+            <div className="start-options">
+              <button 
+                onClick={() => setView('manual-setup')} 
+                className="btn btn-primary btn-large"
+              >
+                <Users size={20} />
+                Configurar Grupos
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -136,11 +177,82 @@ export default function TournamentView({
           <div className="tournament-content">
             {view === 'overview' && (
               <div className="overview">
+                {/* Botón para generar siguiente ronda */}
+                {(() => {
+                  const nextRoundInfo = getNextRoundInfo();
+                  if (nextRoundInfo.canGenerate) {
+                    return (
+                      <div className="next-round-section">
+                        <div className="next-round-info">
+                          <h3>Generar Siguiente Ronda</h3>
+                          <p>Se pueden generar los {nextRoundInfo.nextRound}</p>
+                        </div>
+                        <button 
+                          onClick={handleGenerateNextRound}
+                          className="btn btn-primary btn-large"
+                        >
+                          <Trophy size={20} />
+                          Generar {nextRoundInfo.nextRound}
+                        </button>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+                {/* Botones para rellenar resultados aleatorios */}
+                <div className="random-results-section">
+                  <div className="random-results-info">
+                    <h3>Rellenar Resultados Aleatorios</h3>
+                    <p>Rellena automáticamente todos los partidos pendientes con resultados aleatorios</p>
+                  </div>
+                  <div className="random-results-buttons">
+                    <button 
+                      onClick={handleFillRandomResults}
+                      className="btn btn-secondary btn-large"
+                    >
+                      🎲 Rellenar Todos los Partidos
+                    </button>
+                    <div className="round-specific-buttons">
+                      <button 
+                        onClick={() => handleFillRandomResultsForRound('groups')}
+                        className="btn btn-small"
+                      >
+                        🎲 Grupos
+                      </button>
+                      {tournament.quarterfinals.length > 0 && (
+                        <button 
+                          onClick={() => handleFillRandomResultsForRound('quarterfinals')}
+                          className="btn btn-small"
+                        >
+                          🎲 Cuartos
+                        </button>
+                      )}
+                      {tournament.semifinals.length > 0 && (
+                        <button 
+                          onClick={() => handleFillRandomResultsForRound('semifinals')}
+                          className="btn btn-small"
+                        >
+                          🎲 Semifinales
+                        </button>
+                      )}
+                      {tournament.final && (
+                        <button 
+                          onClick={() => handleFillRandomResultsForRound('final')}
+                          className="btn btn-small"
+                        >
+                          🎲 Final
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 <div className="overview-section">
                   <h3>Próximos Partidos</h3>
                   <div className="upcoming-matches">
                     {tournament.groups.flatMap(group => 
-                      group.matches.filter(match => !match.isCompleted).slice(0, 3)
+                      group.matches.filter(match => !match.isCompleted)
                     ).map(match => (
                       <MatchCard
                         key={match.id}
@@ -214,6 +326,14 @@ export default function TournamentView({
 
             {view === 'stats' && (
               <StatsView tournamentId={tournament.id} />
+            )}
+
+            {view === 'manual-setup' && (
+              <ManualGroupSetup
+                teams={tournament.teams}
+                onGroupsCreated={handleManualGroupsCreated}
+                onBack={() => setView('overview')}
+              />
             )}
           </div>
         </>
