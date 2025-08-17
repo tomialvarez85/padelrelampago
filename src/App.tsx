@@ -87,8 +87,8 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🏓 Pádel Relámpago</h1>
-        <p>Sistema de Gestión de Torneos</p>
+        <h1>🏓 Padel Relampago</h1>
+        <p>Sistema de Gestion de Torneos</p>
       </header>
 
       <main className="app-main">

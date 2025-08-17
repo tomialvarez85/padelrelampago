@@ -80,7 +80,7 @@ export default function TournamentView({
       count += group.matches.filter(match => match.isCompleted).length;
     });
     
-    // Contar partidos de eliminación
+    // Contar partidos de eliminacion
     count += tournament.quarterfinals.filter(match => match.isCompleted).length;
     count += tournament.semifinals.filter(match => match.isCompleted).length;
     if (tournament.final?.isCompleted) count++;
@@ -96,7 +96,7 @@ export default function TournamentView({
       count += group.matches.length;
     });
     
-    // Contar partidos de eliminación
+    // Contar partidos de eliminacion
     count += tournament.quarterfinals.length;
     count += tournament.semifinals.length;
     if (tournament.final) count++;
@@ -131,7 +131,7 @@ export default function TournamentView({
         <div className="tournament-not-started">
           <div className="start-tournament-card">
             <h3>Configurar Grupos</h3>
-            <p>El torneo está creado pero necesita que configures los grupos antes de iniciar las competencias.</p>
+            <p>El torneo esta creado pero necesita que configures los grupos antes de iniciar las competencias.</p>
             <div className="start-options">
               <button 
                 onClick={() => setView('manual-setup')} 
@@ -163,21 +163,21 @@ export default function TournamentView({
               className={`nav-btn ${view === 'bracket' ? 'active' : ''}`}
             >
               <Trophy size={16} />
-              Eliminación
+              Eliminacion
             </button>
             <button
               onClick={() => setView('stats')}
               className={`nav-btn ${view === 'stats' ? 'active' : ''}`}
             >
               <BarChart3 size={16} />
-              Estadísticas
+              Estadisticas
             </button>
           </div>
 
           <div className="tournament-content">
             {view === 'overview' && (
               <div className="overview">
-                {/* Botón para generar siguiente ronda */}
+                {/* Boton para generar siguiente ronda */}
                 {(() => {
                   const nextRoundInfo = getNextRoundInfo();
                   if (nextRoundInfo.canGenerate) {
@@ -204,7 +204,7 @@ export default function TournamentView({
                 <div className="random-results-section">
                   <div className="random-results-info">
                     <h3>Rellenar Resultados Aleatorios</h3>
-                    <p>Rellena automáticamente todos los partidos pendientes con resultados aleatorios</p>
+                    <p>Rellena automaticamente todos los partidos pendientes con resultados aleatorios</p>
                   </div>
                   <div className="random-results-buttons">
                     <button 
@@ -249,7 +249,7 @@ export default function TournamentView({
                 </div>
 
                 <div className="overview-section">
-                  <h3>Próximos Partidos</h3>
+                  <h3>Proximos Partidos</h3>
                   <div className="upcoming-matches">
                     {tournament.groups.flatMap(group => 
                       group.matches.filter(match => !match.isCompleted)

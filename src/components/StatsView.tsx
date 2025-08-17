@@ -71,23 +71,23 @@ export default function StatsView({ tournamentId }: StatsViewProps) {
 
   return (
     <div className="stats-view">
-              <h2>Estadísticas de Parejas</h2>
+              <h2>Estadisticas de Parejas</h2>
       
       {overallStats.length === 0 ? (
         <div className="no-stats">
-          <p>No hay estadísticas disponibles aún.</p>
-          <p>Los datos aparecerán cuando se jueguen los primeros partidos.</p>
+                  <p>No hay estadisticas disponibles aun.</p>
+        <p>Los datos apareceran cuando se jueguen los primeros partidos.</p>
         </div>
       ) : (
         <div className="stats-container">
-          {/* Estadísticas por Grupo */}
-          <div className="group-stats-section">
-            <h3>Estadísticas por Grupo</h3>
+                  {/* Estadisticas por Grupo */}
+        <div className="group-stats-section">
+          <h3>Estadisticas por Grupo</h3>
             {Object.entries(groupStats).map(([groupId, stats]) => {
               const groupName = stats.length > 0 ? 
                 (stats[0]?.teamName.includes('Grupo') ? 
                   stats[0]?.teamName.split(' ')[0] + ' ' + stats[0]?.teamName.split(' ')[1] : 
-                  'Grupo Único') : 
+                  'Grupo Unico') : 
                 'Grupo';
               return (
                 <div key={groupId} className="group-stats">
@@ -97,9 +97,9 @@ export default function StatsView({ tournamentId }: StatsViewProps) {
             })}
           </div>
 
-          {/* Estadísticas Generales */}
-          <div className="overall-stats-section">
-            {renderStatsTable(overallStats, 'Estadísticas Generales')}
+                  {/* Estadisticas Generales */}
+        <div className="overall-stats-section">
+          {renderStatsTable(overallStats, 'Estadisticas Generales')}
           </div>
 
           <div className="stats-summary">

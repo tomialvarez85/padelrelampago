@@ -56,12 +56,12 @@ export class TournamentService {
     const groups: Group[] = [];
     const totalTeams = shuffledTeams.length;
     
-    // Implementar las reglas específicas según la cantidad de parejas
+    // Implementar las reglas especificas segun la cantidad de parejas
     if (totalTeams === 4) {
       // Torneo de 4 parejas: Un grupo de cuatro parejas y pasan los primeros 2 a final
       const group: Group = {
         id: 'group-1',
-        name: 'Grupo Único',
+        name: 'Grupo Unico',
         teams: shuffledTeams,
         matches: this.generateGroupMatches(shuffledTeams, 'group-1'),
       };
@@ -70,7 +70,7 @@ export class TournamentService {
       // Torneo de 5 parejas: Un grupo de 5 parejas y pasan 4 a semifinal
       const group: Group = {
         id: 'group-1',
-        name: 'Grupo Único',
+        name: 'Grupo Unico',
         teams: shuffledTeams,
         matches: this.generateGroupMatches(shuffledTeams, 'group-1'),
       };
@@ -79,7 +79,7 @@ export class TournamentService {
       // Torneo de 6 parejas: Un grupo de 6 parejas y pasan primeros 4 a semifinal
       const group: Group = {
         id: 'group-1',
-        name: 'Grupo Único',
+        name: 'Grupo Unico',
         teams: shuffledTeams,
         matches: this.generateGroupMatches(shuffledTeams, 'group-1'),
       };
@@ -344,7 +344,7 @@ export class TournamentService {
       
       groups.push(group1, group2, group3, group4);
     } else {
-      // Para más de 16 equipos, usar distribución automática
+      // Para mas de 16 equipos, usar distribucion automatica
       let numGroups: number;
       let teamsPerGroup: number;
       
@@ -404,7 +404,7 @@ export class TournamentService {
 
     const tournament = tournaments[tournamentIndex];
     
-    // Verificar que todos los equipos estén asignados
+    // Verificar que todos los equipos esten asignados
     const assignedTeams = groups.flatMap(group => group.teams);
     const allTeams = tournament.teams;
     
@@ -545,7 +545,7 @@ export class TournamentService {
       return false;
     }
     
-    // Verificar que todos los partidos de grupos estén completados
+    // Verificar que todos los partidos de grupos esten completados
     return tournament.groups.every(group => 
       group.matches.every(match => match.isCompleted)
     );
@@ -588,7 +588,7 @@ export class TournamentService {
     const totalTeams = tournament.teams.length;
     const matches: Match[] = [];
     
-    // Obtener estadísticas de todos los grupos
+    // Obtener estadisticas de todos los grupos
     const groupStats: { [groupId: string]: Team[] } = {};
     for (const group of tournament.groups) {
       const stats = this.calculateGroupStats(group);
@@ -608,7 +608,7 @@ export class TournamentService {
     if (totalTeams === 7) {
       // 7 parejas: Grupo A (4 equipos) - 1er pasa a semifinal, 2do, 3ro y 4to van a cuartos
       // Grupo B (3 equipos) - todos van a cuartos
-      // Los del mismo grupo NO se enfrentan entre sí
+      // Los del mismo grupo NO se enfrentan entre si
       const groupA = groupStats[groupIds[0]];
       const groupB = groupStats[groupIds[1]];
       
@@ -682,7 +682,7 @@ export class TournamentService {
       
     } else if (totalTeams === 12 || totalTeams === 13 || totalTeams === 15) {
       // 12, 13, 15 parejas: Dos primeros juegan contra los 2 terceros, 
-      // el primero faltante juega contra un segundo y los otros dos segundos juegan entre sí
+      // el primero faltante juega contra un segundo y los otros dos segundos juegan entre si
       // Todos los cruces tienen que ser entre parejas de distintos grupos
       
       // Obtener todos los primeros, segundos y terceros
@@ -697,7 +697,7 @@ export class TournamentService {
         if (group.length >= 3) thirdPlaces.push(group[2]);
       }
       
-      // Ordenar terceros por estadísticas para obtener los mejores
+      // Ordenar terceros por estadisticas para obtener los mejores
       const thirdPlaceStats: { team: Team; stats: any }[] = [];
       for (const group of tournament.groups) {
         const stats = this.calculateGroupStats(group);
@@ -736,7 +736,7 @@ export class TournamentService {
         round: 'quarterfinal',
       });
       
-      // Los otros dos segundos juegan entre sí
+      // Los otros dos segundos juegan entre si
       matches.push({
         id: 'quarterfinal-4',
         team1: secondPlaces[1],
@@ -783,7 +783,7 @@ export class TournamentService {
       
     } else if (totalTeams === 5 || totalTeams === 6) {
       // 5-6 parejas: van directo a semifinales desde grupos
-      // Obtener las parejas clasificadas del grupo único
+      // Obtener las parejas clasificadas del grupo unico
       const group = tournament.groups[0];
       const groupStats = this.calculateGroupStats(group);
       const sortedTeams = groupStats.map(stat => 
@@ -823,7 +823,7 @@ export class TournamentService {
         .filter(match => match.winner)
         .map(match => match.winner!);
       
-      // Crear semifinales: 1er grupo A vs ganador cuartos, otros dos ganadores entre sí
+      // Crear semifinales: 1er grupo A vs ganador cuartos, otros dos ganadores entre si
       matches.push({
         id: 'semifinal-1',
         team1: groupAFirst,
@@ -919,7 +919,7 @@ export class TournamentService {
   private static calculateGroupStats(group: Group): TeamStats[] {
     const stats: { [teamId: string]: TeamStats } = {};
     
-    // Inicializar estadísticas
+    // Inicializar estadisticas
     for (const team of group.teams) {
       stats[team.id] = {
         teamId: team.id,
@@ -934,7 +934,7 @@ export class TournamentService {
       };
     }
 
-    // Calcular estadísticas
+    // Calcular estadisticas
     for (const match of group.matches) {
       if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
         stats[match.team1.id].totalMatches++;
@@ -989,7 +989,7 @@ export class TournamentService {
 
     const stats: { [teamId: string]: TeamStats } = {};
     
-    // Inicializar estadísticas
+    // Inicializar estadisticas
     for (const team of tournament.teams) {
       stats[team.id] = {
         teamId: team.id,
@@ -1028,7 +1028,7 @@ export class TournamentService {
       }
     }
 
-    // Contar partidos de eliminación
+    // Contar partidos de eliminacion
     const eliminationMatches = [
       ...tournament.quarterfinals,
       ...tournament.semifinals,
@@ -1111,7 +1111,7 @@ export class TournamentService {
 
     const tournament = tournaments[tournamentIndex];
     
-    // Verificar qué ronda se puede generar
+    // Verificar que ronda se puede generar
     if (this.canGenerateQuarterfinals(tournament)) {
       tournament.quarterfinals = this.generateQuarterfinals(tournament);
     } else if (this.canGenerateSemifinals(tournament)) {
@@ -1145,7 +1145,7 @@ export class TournamentService {
     return { canGenerate: false, nextRound: '' };
   }
 
-  // Función para rellenar resultados aleatorios
+      // Funcion para rellenar resultados aleatorios
   static fillRandomResults(tournamentId: string): Tournament {
     const tournaments = this.getStoredTournaments();
     const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
@@ -1156,9 +1156,9 @@ export class TournamentService {
 
     const tournament = tournaments[tournamentIndex];
     
-    // Función auxiliar para generar resultado aleatorio
+    // Funcion auxiliar para generar resultado aleatorio
     const generateRandomScore = () => {
-      // Generar scores típicos de pádel (6-0, 6-1, 6-2, 6-3, 6-4, 7-5, 7-6, etc.)
+      // Generar scores tipicos de padel (6-0, 6-1, 6-2, 6-3, 6-4, 7-5, 7-6, etc.)
       const scores = [6, 7];
       const team1Score = scores[Math.floor(Math.random() * scores.length)];
       let team2Score;
@@ -1223,7 +1223,7 @@ export class TournamentService {
     return tournament;
   }
 
-  // Función para rellenar solo los partidos pendientes de una ronda específica
+  // Funcion para rellenar solo los partidos pendientes de una ronda especifica
   static fillRandomResultsForRound(tournamentId: string, round: 'groups' | 'quarterfinals' | 'semifinals' | 'final'): Tournament {
     const tournaments = this.getStoredTournaments();
     const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
@@ -1234,7 +1234,7 @@ export class TournamentService {
 
     const tournament = tournaments[tournamentIndex];
     
-    // Función auxiliar para generar resultado aleatorio
+    // Funcion auxiliar para generar resultado aleatorio
     const generateRandomScore = () => {
       const scores = [6, 7];
       const team1Score = scores[Math.floor(Math.random() * scores.length)];

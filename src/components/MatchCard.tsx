@@ -22,7 +22,7 @@ export default function MatchCard({
     const score2 = parseInt(team2Score);
     
     if (isNaN(score1) || isNaN(score2)) {
-      alert('Por favor ingresa puntuaciones válidas');
+      alert('Por favor ingresa puntuaciones validas');
       return;
     }
     

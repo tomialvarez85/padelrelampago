@@ -17,7 +17,7 @@ export default function GroupView({ groups, onMatchResult }: GroupViewProps) {
       gamesDifference: number;
     } } = {};
     
-    // Inicializar estadísticas
+    // Inicializar estadisticas
     group.teams.forEach(team => {
       stats[team.id] = { 
         wins: 0, 
@@ -29,7 +29,7 @@ export default function GroupView({ groups, onMatchResult }: GroupViewProps) {
       };
     });
 
-    // Calcular estadísticas
+    // Calcular estadisticas
     group.matches.forEach(match => {
       if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
         // Sumar games
@@ -53,7 +53,7 @@ export default function GroupView({ groups, onMatchResult }: GroupViewProps) {
       stat.gamesDifference = stat.gamesFor - stat.gamesAgainst;
     });
 
-    // Ordenar por criterios de clasificación: victorias, diferencia de games, games a favor
+    // Ordenar por criterios de clasificacion: victorias, diferencia de games, games a favor
     return Object.values(stats).sort((a, b) => {
       // 1er criterio: Victorias
       if (b.wins !== a.wins) {

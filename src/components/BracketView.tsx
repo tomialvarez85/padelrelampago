@@ -16,7 +16,7 @@ export default function BracketView({
 }: BracketViewProps) {
   return (
     <div className="bracket-view">
-      <h2>Fase de Eliminación</h2>
+      <h2>Fase de Eliminacion</h2>
       
       <div className="bracket-container">
         {/* Cuartos de Final - solo mostrar si existen */}
@@ -41,8 +41,8 @@ export default function BracketView({
           {semifinals.length === 0 ? (
             <p className="no-matches">
               {quarterfinals.length === 0 
-                ? 'Las semifinales se generarán automáticamente cuando se completen todos los partidos del grupo único.'
-                : 'Las semifinales se generarán automáticamente cuando se completen todos los cuartos de final.'
+                        ? 'Las semifinales se generaran automaticamente cuando se completen todos los partidos del grupo unico.'
+        : 'Las semifinales se generaran automaticamente cuando se completen todos los cuartos de final.'
               }
             </p>
           ) : (
@@ -63,7 +63,7 @@ export default function BracketView({
           <h3>Final</h3>
           {!final ? (
             <p className="no-matches">
-              La final se generará automáticamente cuando se completen todas las semifinales.
+              La final se generara automaticamente cuando se completen todas las semifinales.
             </p>
           ) : (
             <div className="final-match">
@@ -76,11 +76,11 @@ export default function BracketView({
         </div>
       </div>
 
-      {/* Campeón */}
+              {/* Campeon */}
       {final?.isCompleted && final.winner && (
         <div className="champion-section">
           <div className="champion-card">
-            <h3>🏆 Campeón</h3>
+                            <h3>🏆 Campeon</h3>
             <div className="champion-team">
               <h2>{final.winner.name}</h2>
               <p>{final.winner.player1.lastName} & {final.winner.player2.lastName}</p>

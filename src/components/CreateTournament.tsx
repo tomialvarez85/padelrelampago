@@ -20,21 +20,21 @@ export default function CreateTournament({
 
   // Lista de apellidos comunes para generar aleatoriamente
   const randomSurnames = [
-    'García', 'Rodríguez', 'López', 'Martínez', 'González', 'Pérez', 'Sánchez', 'Ramírez',
+    'Garcia', 'Rodriguez', 'Lopez', 'Martinez', 'Gonzalez', 'Perez', 'Sanchez', 'Ramirez',
     'Torres', 'Flores', 'Rivera', 'Morales', 'Cruz', 'Ortiz', 'Silva', 'Reyes',
-    'Moreno', 'Jiménez', 'Díaz', 'Romero', 'Herrera', 'Ruiz', 'Vargas', 'Mendoza',
-    'Castro', 'Fernández', 'Gutiérrez', 'Ramos', 'Alvarez', 'Molina', 'Navarro', 'Delgado',
-    'Vega', 'Rojas', 'Campos', 'Guerrero', 'Cortés', 'Paredes', 'Salazar', 'Vásquez',
+    'Moreno', 'Jimenez', 'Diaz', 'Romero', 'Herrera', 'Ruiz', 'Vargas', 'Mendoza',
+    'Castro', 'Fernandez', 'Gutierrez', 'Ramos', 'Alvarez', 'Molina', 'Navarro', 'Delgado',
+    'Vega', 'Rojas', 'Campos', 'Guerrero', 'Cortes', 'Paredes', 'Salazar', 'Vasquez',
     'Acosta', 'Figueroa', 'Lara', 'Bravo', 'Miranda', 'Valenzuela', 'Tapia', 'Espinoza',
-    'Fuentes', 'Aguilar', 'Zúñiga', 'Cárdenas', 'Soto', 'Contreras', 'Valdez', 'Castillo',
-    'Carrasco', 'Córdova', 'Escobar', 'Ponce', 'Medina', 'Sepúlveda', 'Herrera', 'Riquelme',
+    'Fuentes', 'Aguilar', 'Zuniga', 'Cardenas', 'Soto', 'Contreras', 'Valdez', 'Castillo',
+    'Carrasco', 'Cordova', 'Escobar', 'Ponce', 'Medina', 'Sepulveda', 'Herrera', 'Riquelme',
     'Araya', 'Leiva', 'Toro', 'Vergara', 'Maldonado', 'Bustos', 'Carvajal', 'Donoso',
-    'Farias', 'Gallardo', 'Henríquez', 'Ibarra', 'Jara', 'Klein', 'Lagos', 'Mansilla'
+    'Farias', 'Gallardo', 'Henriquez', 'Ibarra', 'Jara', 'Klein', 'Lagos', 'Mansilla'
   ];
 
   const generateRandomTeams = () => {
     if (autoTeamCount < 4 || autoTeamCount > 16) {
-      alert('El número de parejas debe estar entre 4 y 16');
+      alert('El numero de parejas debe estar entre 4 y 16');
       return;
     }
 
@@ -124,7 +124,7 @@ export default function CreateTournament({
 
       <div className="create-tournament-content">
         <div className="tournament-name-form">
-          <h3>Información del Torneo</h3>
+          <h3>Informacion del Torneo</h3>
           <div className="tournament-name-input">
             <div className="input-group">
               <label htmlFor="tournamentName">Nombre del Torneo:</label>
@@ -141,10 +141,10 @@ export default function CreateTournament({
         </div>
 
         <div className="auto-team-form">
-          <h3>Generar Parejas Automáticamente</h3>
+                      <h3>Generar Parejas Automaticamente</h3>
           <div className="auto-team-inputs">
             <div className="input-group">
-              <label htmlFor="autoTeamCount">Número de Parejas:</label>
+                              <label htmlFor="autoTeamCount">Numero de Parejas:</label>
               <input
                 id="autoTeamCount"
                 type="number"
@@ -161,9 +161,9 @@ export default function CreateTournament({
               Generar {autoTeamCount} Parejas Aleatorias
             </button>
           </div>
-          <p className="info-text">
-            Esta opción generará automáticamente el número especificado de parejas con apellidos aleatorios.
-          </p>
+                        <p className="info-text">
+                Esta opcion generara automaticamente el numero especificado de parejas con apellidos aleatorios.
+              </p>
         </div>
 
         <div className="team-form">
@@ -247,9 +247,9 @@ export default function CreateTournament({
           
                      {teams.length >= 4 && (
              <div className="group-info">
-               <h4>Próximo Paso:</h4>
+               <h4>Proximo Paso:</h4>
                <p className="info-text">
-                 Después de crear el torneo, configurarás los grupos manualmente antes de iniciar las competencias.
+                 Despues de crear el torneo, configuraras los grupos manualmente antes de iniciar las competencias.
                </p>
              </div>
            )}

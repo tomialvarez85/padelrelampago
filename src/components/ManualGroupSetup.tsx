@@ -19,10 +19,10 @@ export default function ManualGroupSetup({
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [editingGroupName, setEditingGroupName] = useState<string>('');
 
-  // Calcular número óptimo de grupos según las reglas específicas
+      // Calcular numero optimo de grupos segun las reglas especificas
   const calculateOptimalGroups = () => {
     const totalTeams = teams.length;
-      if (totalTeams <= 6) return 1; // 4, 5, 6 parejas: 1 grupo único
+      if (totalTeams <= 6) return 1; // 4, 5, 6 parejas: 1 grupo unico
   if (totalTeams <= 8) return 2; // 7, 8 parejas: 2 grupos
   if (totalTeams <= 10) return 2; // 9, 10 parejas: 2 grupos
   if (totalTeams <= 12) return 3; // 11, 12 parejas: 3 grupos
@@ -39,7 +39,7 @@ export default function ManualGroupSetup({
     setUnassignedTeams([...teams]);
   }, [teams]);
 
-  // Crear grupos vacíos
+      // Crear grupos vacios
   const createEmptyGroups = (count: number) => {
     const newGroups: Group[] = [];
     for (let i = 0; i < count; i++) {
@@ -53,18 +53,18 @@ export default function ManualGroupSetup({
     setGroups(newGroups);
   };
 
-  // Distribuir parejas automáticamente según las reglas específicas
+      // Distribuir parejas automaticamente segun las reglas especificas
   const distributeAutomatically = () => {
     const shuffledTeams = [...teams].sort(() => Math.random() - 0.5);
     const newGroups: Group[] = [];
     const totalTeams = teams.length;
     
-    // Crear grupos según las reglas específicas
+    // Crear grupos segun las reglas especificas
     if (totalTeams <= 6) {
-      // 4, 5, 6 parejas: 1 grupo único
+              // 4, 5, 6 parejas: 1 grupo unico
       newGroups.push({
         id: 'group-1',
-        name: 'Grupo Único',
+                  name: 'Grupo Unico',
         teams: shuffledTeams,
         matches: [],
       });
@@ -251,7 +251,7 @@ export default function ManualGroupSetup({
         matches: [],
       });
     } else {
-      // Para más de 16 parejas, distribución general
+      // Para mas de 16 parejas, distribucion general
       for (let i = 0; i < groupCount; i++) {
         newGroups.push({
           id: `group-${i + 1}`,
@@ -296,7 +296,7 @@ export default function ManualGroupSetup({
     setUnassignedTeams(prev => [...prev, team]);
   };
 
-  // Iniciar edición del nombre del grupo
+      // Iniciar edicion del nombre del grupo
   const startEditingGroupName = (group: Group) => {
     setEditingGroupId(group.id);
     setEditingGroupName(group.name);
@@ -317,7 +317,7 @@ export default function ManualGroupSetup({
     setEditingGroupName('');
   };
 
-  // Cancelar edición del nombre del grupo
+      // Cancelar edicion del nombre del grupo
   const cancelEditingGroupName = () => {
     setEditingGroupId(null);
     setEditingGroupName('');
@@ -356,7 +356,7 @@ export default function ManualGroupSetup({
     return totalAssigned === teams.length && groups.every(group => group.teams.length >= 2);
   };
 
-  // Cambiar número de grupos
+      // Cambiar numero de grupos
   const handleGroupCountChange = (count: number) => {
     setGroupCount(count);
     createEmptyGroups(count);
@@ -378,7 +378,7 @@ export default function ManualGroupSetup({
       {/* Controles */}
       <div className="setup-controls">
         <div className="control-group">
-          <label htmlFor="groupCount">Número de grupos:</label>
+                      <label htmlFor="groupCount">Numero de grupos:</label>
           <select
             id="groupCount"
             value={groupCount}
@@ -395,7 +395,7 @@ export default function ManualGroupSetup({
           className="btn btn-secondary"
         >
           <Shuffle size={16} />
-          Distribuir Según Reglas
+                      Distribuir Segun Reglas
         </button>
       </div>
 
@@ -406,7 +406,7 @@ export default function ManualGroupSetup({
           <h3>Parejas sin asignar ({unassignedTeams.length})</h3>
           <div className="unassigned-teams">
             {unassignedTeams.length === 0 ? (
-              <p className="empty-message">Todas las parejas están asignadas</p>
+              <p className="empty-message">Todas las parejas estan asignadas</p>
             ) : (
               unassignedTeams.map(team => (
                 <div key={team.id} className="team-item unassigned">
@@ -493,7 +493,7 @@ export default function ManualGroupSetup({
                 {/* Advertencia si no hay suficientes equipos */}
                 {group.teams.length < 2 && (
                   <p className="warning-text">
-                    Mínimo 2 parejas por grupo
+                    Minimo 2 parejas por grupo
                   </p>
                 )}
               </div>
@@ -523,9 +523,9 @@ export default function ManualGroupSetup({
         )}
         
         <div className="rules-info">
-          <h4>Reglas de Distribución:</h4>
+                      <h4>Reglas de Distribucion:</h4>
           <ul>
-            <li><strong>4-6 parejas:</strong> 1 grupo único</li>
+                          <li><strong>4-6 parejas:</strong> 1 grupo unico</li>
             <li><strong>7 parejas:</strong> 1 grupo de 4 + 1 grupo de 3</li>
             <li><strong>8 parejas:</strong> 2 grupos de 4</li>
             <li><strong>9 parejas:</strong> 1 grupo de 4 + 1 grupo de 5</li>
