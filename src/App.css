@@ -1703,6 +1703,12 @@ body {
   .tournament-name-input {
     flex-direction: column;
     gap: 0.75rem;
+    align-items: center;
+  }
+  
+  .tournament-name-input .input-group {
+    width: 100%;
+    max-width: 400px;
   }
   
   .auto-team-inputs {
@@ -2249,6 +2255,12 @@ body {
   .tournament-name-input {
     flex-direction: column;
     gap: 1rem;
+    align-items: center;
+  }
+  
+  .tournament-name-input .input-group {
+    width: 100%;
+    max-width: 450px;
   }
   
   .auto-team-inputs {

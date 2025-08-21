@@ -16,7 +16,7 @@ export default function CreateTournament({
   const [teams, setTeams] = useState<Team[]>([]);
   const [player1LastName, setPlayer1LastName] = useState('');
   const [player2LastName, setPlayer2LastName] = useState('');
-  const [autoTeamCount, setAutoTeamCount] = useState(8);
+  const [autoTeamCount, setAutoTeamCount] = useState<number | undefined>(undefined);
 
   // Lista de apellidos comunes para generar aleatoriamente
   const randomSurnames = [
@@ -33,8 +33,8 @@ export default function CreateTournament({
   ];
 
   const generateRandomTeams = () => {
-    if (autoTeamCount < 4 || autoTeamCount > 16) {
-      alert('El numero de parejas debe estar entre 4 y 16');
+    if (!autoTeamCount || autoTeamCount < 4 || autoTeamCount > 16) {
+      alert('Por favor ingresa un numero de parejas entre 4 y 16');
       return;
     }
 
@@ -150,15 +150,20 @@ export default function CreateTournament({
                 type="number"
                 min="4"
                 max="16"
-                value={autoTeamCount}
-                onChange={(e) => setAutoTeamCount(parseInt(e.target.value) || 8)}
+                value={autoTeamCount || ''}
+                onChange={(e) => setAutoTeamCount(e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="4-16"
                 className="input"
               />
             </div>
             
-            <button onClick={generateRandomTeams} className="btn btn-secondary">
+            <button 
+              onClick={generateRandomTeams} 
+              className="btn btn-secondary"
+              disabled={!autoTeamCount}
+            >
               <Users size={16} />
-              Generar {autoTeamCount} Parejas Aleatorias
+              Generar {autoTeamCount || 'X'} Parejas Aleatorias
             </button>
           </div>
                         <p className="info-text">
