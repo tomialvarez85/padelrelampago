@@ -591,7 +591,7 @@ export class TournamentService {
     // Obtener estadisticas de todos los grupos
     const groupStats: { [groupId: string]: Team[] } = {};
     for (const group of tournament.groups) {
-      const stats = this.calculateGroupStats(group);
+      const stats = this.calculateGroupStats(group, tournament.id);
       const sortedTeams = stats.map(stat => 
         group.teams.find(team => team.id === stat.teamId)!
       );
@@ -700,7 +700,7 @@ export class TournamentService {
       // Ordenar terceros por estadisticas para obtener los mejores
       const thirdPlaceStats: { team: Team; stats: any }[] = [];
       for (const group of tournament.groups) {
-        const stats = this.calculateGroupStats(group);
+        const stats = this.calculateGroupStats(group, tournament.id);
         if (stats.length >= 3) {
           thirdPlaceStats.push({ team: groupStats[group.id][2], stats: stats[2] });
         }
@@ -785,7 +785,7 @@ export class TournamentService {
       // 5-6 parejas: van directo a semifinales desde grupos
       // Obtener las parejas clasificadas del grupo unico
       const group = tournament.groups[0];
-      const groupStats = this.calculateGroupStats(group);
+      const groupStats = this.calculateGroupStats(group, tournament.id);
       const sortedTeams = groupStats.map(stat => 
         group.teams.find(team => team.id === stat.teamId)!
       );
@@ -814,7 +814,7 @@ export class TournamentService {
     } else if (totalTeams === 7) {
       // 7 parejas: 1er del grupo A pasa directo a semifinal + ganadores de cuartos
       const groupA = tournament.groups.find(g => g.name === 'Grupo A')!;
-      const groupAStats = this.calculateGroupStats(groupA);
+      const groupAStats = this.calculateGroupStats(groupA, tournament.id);
       const sortedGroupA = groupAStats.sort((a, b) => b.wins - a.wins);
       const groupAFirst = groupA.teams.find(team => team.id === sortedGroupA[0].teamId)!;
       
@@ -846,7 +846,7 @@ export class TournamentService {
       // 11 parejas: pasan los primeros 4 de cada grupo a semifinal
       const semifinalists: Team[] = [];
       for (const group of tournament.groups) {
-        const groupStats = this.calculateGroupStats(group);
+        const groupStats = this.calculateGroupStats(group, tournament.id);
         const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
         semifinalists.push(...sortedTeams.slice(0, 4).map(stat => 
           group.teams.find(team => team.id === stat.teamId)!
@@ -895,7 +895,7 @@ export class TournamentService {
     if (totalTeams === 4) {
       // Torneo de 4 parejas: los 2 mejores del grupo van a final
       const group = tournament.groups[0];
-      const groupStats = this.calculateGroupStats(group);
+      const groupStats = this.calculateGroupStats(group, tournament.id);
       const sortedTeams = groupStats.sort((a, b) => b.wins - a.wins);
       finalists = sortedTeams.slice(0, 2).map(stat => 
         group.teams.find(team => team.id === stat.teamId)!
@@ -916,7 +916,7 @@ export class TournamentService {
     };
   }
 
-  private static calculateGroupStats(group: Group): TeamStats[] {
+  private static calculateGroupStats(group: Group, tournamentId?: string): TeamStats[] {
     const stats: { [teamId: string]: TeamStats } = {};
     
     // Inicializar estadisticas
@@ -934,31 +934,98 @@ export class TournamentService {
       };
     }
 
-    // Calcular estadisticas incluyendo partidos extra del grupo
-    for (const match of group.matches) {
-      if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
-        // Verificar que ambos equipos pertenezcan al grupo (para partidos extra)
-        const team1InGroup = group.teams.some(team => team.id === match.team1.id);
-        const team2InGroup = group.teams.some(team => team.id === match.team2.id);
-        
-        // Solo incluir el partido si ambos equipos pertenecen al grupo
-        if (team1InGroup && team2InGroup) {
-          stats[match.team1.id].totalMatches++;
-          stats[match.team2.id].totalMatches++;
+    // Obtener el torneo para acceder a todos los partidos extra
+    const tournament = tournamentId ? this.getTournament(tournamentId) : null;
+    if (!tournament) {
+      // Si no se puede obtener el torneo, usar solo los partidos del grupo
+      for (const match of group.matches) {
+        if (match.isCompleted && match.winner && match.team1Score !== undefined && match.team2Score !== undefined) {
+          // Verificar que ambos equipos pertenezcan al grupo
+          const team1InGroup = group.teams.some(team => team.id === match.team1.id);
+          const team2InGroup = group.teams.some(team => team.id === match.team2.id);
           
-          // Sumar games
-          stats[match.team1.id].gamesFor += match.team1Score;
-          stats[match.team1.id].gamesAgainst += match.team2Score;
-          stats[match.team2.id].gamesFor += match.team2Score;
-          stats[match.team2.id].gamesAgainst += match.team1Score;
-          
-          if (match.winner.id === match.team1.id) {
-            stats[match.team1.id].wins++;
-            stats[match.team2.id].losses++;
-          } else {
-            stats[match.team2.id].wins++;
-            stats[match.team1.id].losses++;
+          // Solo incluir el partido si ambos equipos pertenecen al grupo
+          if (team1InGroup && team2InGroup) {
+            stats[match.team1.id].totalMatches++;
+            stats[match.team2.id].totalMatches++;
+            
+            // Sumar games
+            stats[match.team1.id].gamesFor += match.team1Score;
+            stats[match.team1.id].gamesAgainst += match.team2Score;
+            stats[match.team2.id].gamesFor += match.team2Score;
+            stats[match.team2.id].gamesAgainst += match.team1Score;
+            
+            if (match.winner.id === match.team1.id) {
+              stats[match.team1.id].wins++;
+              stats[match.team2.id].losses++;
+            } else {
+              stats[match.team2.id].wins++;
+              stats[match.team1.id].losses++;
+            }
           }
+        }
+             }
+       
+       // Calcular porcentaje de victorias y diferencia de games
+       Object.values(stats).forEach(stat => {
+         stat.winPercentage = stat.totalMatches > 0 
+           ? (stat.wins / stat.totalMatches) * 100 
+           : 0;
+         stat.gamesDifference = stat.gamesFor - stat.gamesAgainst;
+       });
+
+       // Ordenar por criterios de clasificación: victorias, diferencia de games, games a favor
+       return Object.values(stats).sort((a, b) => {
+         // 1er criterio: Victorias
+         if (b.wins !== a.wins) {
+           return b.wins - a.wins;
+         }
+         
+         // 2do criterio: Diferencia de games
+         if (b.gamesDifference !== a.gamesDifference) {
+           return b.gamesDifference - a.gamesDifference;
+         }
+         
+         // 3er criterio: Games a favor
+         return b.gamesFor - a.gamesFor;
+       });
+     }
+
+    // Obtener todos los partidos del torneo
+    const allMatches = this.getAllMatches(tournament.id);
+    
+    // Filtrar partidos que involucren equipos del grupo (incluyendo partidos extra de fase de grupos)
+    const relevantMatches = allMatches.filter(match => {
+      if (!match.isCompleted || !match.winner || match.team1Score === undefined || match.team2Score === undefined) {
+        return false;
+      }
+      
+      // Verificar que ambos equipos pertenezcan al grupo
+      const team1InGroup = group.teams.some(team => team.id === match.team1.id);
+      const team2InGroup = group.teams.some(team => team.id === match.team2.id);
+      
+      // Incluir partidos donde ambos equipos son del grupo Y el partido es de fase de grupos
+      return team1InGroup && team2InGroup && (match.round === 'group' || match.round === 'interzonal');
+    });
+
+    // Calcular estadisticas con todos los partidos relevantes
+    for (const match of relevantMatches) {
+      if (match.team1Score !== undefined && match.team2Score !== undefined && match.winner) {
+        stats[match.team1.id].totalMatches++;
+        stats[match.team2.id].totalMatches++;
+        
+        // Sumar games
+        stats[match.team1.id].gamesFor += match.team1Score;
+        stats[match.team1.id].gamesAgainst += match.team2Score;
+        stats[match.team2.id].gamesFor += match.team2Score;
+        stats[match.team2.id].gamesAgainst += match.team1Score;
+        
+        if (match.winner.id === match.team1.id) {
+          stats[match.team1.id].wins++;
+          stats[match.team2.id].losses++;
+        } else {
+          stats[match.team2.id].wins++;
+          stats[match.team1.id].losses++;
         }
       }
     }
@@ -1068,7 +1135,7 @@ export class TournamentService {
     const groupStats: { [groupId: string]: TeamStats[] } = {};
     
     for (const group of tournament.groups) {
-      groupStats[group.id] = this.calculateGroupStats(group);
+      groupStats[group.id] = this.calculateGroupStats(group, tournamentId);
     }
 
     return groupStats;
@@ -1125,160 +1192,7 @@ export class TournamentService {
     return { canGenerate: false, nextRound: '' };
   }
 
-      // Funcion para rellenar resultados aleatorios (completa y guarda)
-  static fillRandomResults(tournamentId: string): Tournament {
-    console.log('fillRandomResults iniciado para torneo:', tournamentId);
-    const tournaments = this.getStoredTournaments();
-    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
-    
-    if (tournamentIndex === -1) {
-      throw new Error('Tournament not found');
-    }
 
-    const tournament = tournaments[tournamentIndex];
-    console.log('Tournament encontrado:', tournament.name);
-    
-    // Funcion auxiliar para generar resultado aleatorio
-    const generateRandomScore = () => {
-      // Generar scores tipicos de padel (6-0, 6-1, 6-2, 6-3, 6-4, 7-5, 7-6, etc.)
-      const scores = [6, 7];
-      const team1Score = scores[Math.floor(Math.random() * scores.length)];
-      let team2Score;
-      
-      if (team1Score === 6) {
-        team2Score = Math.floor(Math.random() * 6); // 0-5
-      } else {
-        team2Score = Math.floor(Math.random() * 7); // 0-6
-      }
-      
-      return { team1Score, team2Score };
-    };
-
-    // Rellenar resultados de grupos
-    for (const group of tournament.groups) {
-      for (const match of group.matches) {
-        if (!match.isCompleted) {
-          const { team1Score, team2Score } = generateRandomScore();
-          match.team1Score = team1Score;
-          match.team2Score = team2Score;
-          match.winner = team1Score > team2Score ? match.team1 : match.team2;
-          // NO marcar como completado automáticamente
-        }
-      }
-    }
-
-    // Rellenar resultados de cuartos de final
-    for (const match of tournament.quarterfinals) {
-      if (!match.isCompleted) {
-        const { team1Score, team2Score } = generateRandomScore();
-        match.team1Score = team1Score;
-        match.team2Score = team2Score;
-        match.winner = team1Score > team2Score ? match.team1 : match.team2;
-        // NO marcar como completado automáticamente
-      }
-    }
-
-    // Rellenar resultados de semifinales
-    for (const match of tournament.semifinals) {
-      if (!match.isCompleted) {
-        const { team1Score, team2Score } = generateRandomScore();
-        match.team1Score = team1Score;
-        match.team2Score = team2Score;
-        match.winner = team1Score > team2Score ? match.team1 : match.team2;
-        // NO marcar como completado automáticamente
-      }
-    }
-
-    // Rellenar resultado de final
-    if (tournament.final && !tournament.final.isCompleted) {
-      const { team1Score, team2Score } = generateRandomScore();
-      tournament.final.team1Score = team1Score;
-      tournament.final.team2Score = team2Score;
-      tournament.final.winner = team1Score > team2Score ? tournament.final.team1 : tournament.final.team2;
-      // NO marcar como completado automáticamente
-    }
-
-    // Guardar los cambios después de completar los resultados
-    console.log('Guardando cambios en el torneo...');
-    tournaments[tournamentIndex] = tournament;
-    this.saveTournaments(tournaments);
-    console.log('Cambios guardados exitosamente');
-    
-    return tournament;
-  }
-
-  // Funcion para rellenar solo los partidos pendientes de una ronda especifica (completa y guarda)
-  static fillRandomResultsForRound(tournamentId: string, round: 'groups' | 'quarterfinals' | 'semifinals' | 'final'): Tournament {
-    const tournaments = this.getStoredTournaments();
-    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
-    
-    if (tournamentIndex === -1) {
-      throw new Error('Tournament not found');
-    }
-
-    const tournament = tournaments[tournamentIndex];
-    
-    // Funcion auxiliar para generar resultado aleatorio
-    const generateRandomScore = () => {
-      const scores = [6, 7];
-      const team1Score = scores[Math.floor(Math.random() * scores.length)];
-      let team2Score;
-      
-      if (team1Score === 6) {
-        team2Score = Math.floor(Math.random() * 6);
-      } else {
-        team2Score = Math.floor(Math.random() * 7);
-      }
-      
-      return { team1Score, team2Score };
-    };
-
-    if (round === 'groups') {
-      for (const group of tournament.groups) {
-        for (const match of group.matches) {
-          if (!match.isCompleted) {
-            const { team1Score, team2Score } = generateRandomScore();
-            match.team1Score = team1Score;
-            match.team2Score = team2Score;
-            match.winner = team1Score > team2Score ? match.team1 : match.team2;
-            // NO marcar como completado automáticamente
-          }
-        }
-      }
-    } else if (round === 'quarterfinals') {
-      for (const match of tournament.quarterfinals) {
-        if (!match.isCompleted) {
-          const { team1Score, team2Score } = generateRandomScore();
-          match.team1Score = team1Score;
-          match.team2Score = team2Score;
-          match.winner = team1Score > team2Score ? match.team1 : match.team2;
-          // NO marcar como completado automáticamente
-        }
-      }
-    } else if (round === 'semifinals') {
-      for (const match of tournament.semifinals) {
-        if (!match.isCompleted) {
-          const { team1Score, team2Score } = generateRandomScore();
-          match.team1Score = team1Score;
-          match.team2Score = team2Score;
-          match.winner = team1Score > team2Score ? match.team1 : match.team2;
-          // NO marcar como completado automáticamente
-        }
-      }
-    } else if (round === 'final' && tournament.final && !tournament.final.isCompleted) {
-      const { team1Score, team2Score } = generateRandomScore();
-      tournament.final.team1Score = team1Score;
-      tournament.final.team2Score = team2Score;
-      tournament.final.winner = team1Score > team2Score ? tournament.final.team1 : tournament.final.team2;
-      // NO marcar como completado automáticamente
-    }
-
-    // Guardar los cambios después de completar los resultados
-    tournaments[tournamentIndex] = tournament;
-    this.saveTournaments(tournaments);
-    
-    return tournament;
-  }
 
   // Funcion para borrar un partido
   static deleteMatch(tournamentId: string, matchId: string): Tournament {

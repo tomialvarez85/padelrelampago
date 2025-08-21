@@ -80,27 +80,7 @@ export default function TournamentView({
     return TournamentService.canGenerateNextRound(tournament.id);
   };
 
-  const handleFillRandomResults = () => {
-    try {
-      console.log('Iniciando fillRandomResults para torneo:', tournament.id);
-      const updatedTournament = TournamentService.fillRandomResults(tournament.id);
-      console.log('Tournament actualizado:', updatedTournament);
-      onTournamentUpdated();
-      console.log('Función completada exitosamente');
-    } catch (error) {
-      console.error('Error en handleFillRandomResults:', error);
-      alert(error instanceof Error ? error.message : 'Error al rellenar resultados aleatorios');
-    }
-  };
 
-  const handleFillRandomResultsForRound = (round: 'groups' | 'quarterfinals' | 'semifinals' | 'final') => {
-    try {
-      TournamentService.fillRandomResultsForRound(tournament.id, round);
-      onTournamentUpdated();
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Error al rellenar resultados aleatorios');
-    }
-  };
 
   const getCompletedMatchesCount = () => {
     let count = 0;
@@ -230,53 +210,7 @@ export default function TournamentView({
                   return null;
                 })()}
 
-                {/* Botones para rellenar resultados aleatorios */}
-                <div className="random-results-section">
-                  <div className="random-results-info">
-                    <h3>Completar Resultados Aleatorios</h3>
-                    <p>Completa automaticamente todos los partidos pendientes con resultados aleatorios</p>
-                  </div>
-                  <div className="random-results-buttons">
-                    <button 
-                      onClick={handleFillRandomResults}
-                      className="btn btn-secondary btn-large"
-                    >
-                      🎲 Completar Todos los Partidos
-                    </button>
-                    <div className="round-specific-buttons">
-                      <button 
-                        onClick={() => handleFillRandomResultsForRound('groups')}
-                        className="btn btn-small"
-                      >
-                        🎲 Grupos
-                      </button>
-                      {tournament.quarterfinals.length > 0 && (
-                        <button 
-                          onClick={() => handleFillRandomResultsForRound('quarterfinals')}
-                          className="btn btn-small"
-                        >
-                          🎲 Cuartos
-                        </button>
-                      )}
-                      {tournament.semifinals.length > 0 && (
-                        <button 
-                          onClick={() => handleFillRandomResultsForRound('semifinals')}
-                          className="btn btn-small"
-                        >
-                          🎲 Semifinales
-                        </button>
-                      )}
-                      {tournament.final && (
-                        <button 
-                          onClick={() => handleFillRandomResultsForRound('final')}
-                          className="btn btn-small"
-                        >
-                          🎲 Final
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+
 
                 <div className="overview-section">
                   <div className="section-header">
