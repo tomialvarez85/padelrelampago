@@ -32,6 +32,33 @@
   .group-card:active {
     transform: scale(0.98);
   }
+  
+  /* Improve touch targets */
+  .btn {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .btn-small {
+    padding: 0.5rem 1rem;
+  }
+  
+  .nav-btn {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  /* Better spacing for touch */
+  .match-card,
+  .tournament-card,
+  .group-card {
+    margin-bottom: 1rem;
+  }
+  
+  /* Improve form elements */
+  .input,
+  select,
+  .btn {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
 }
 
 body {
@@ -49,6 +76,18 @@ body {
   html {
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Better text rendering on mobile */
+body {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 .app {
@@ -1071,6 +1110,45 @@ body {
   color: #2d3748;
 }
 
+/* Mobile table improvements */
+@media (max-width: 768px) {
+  .stats-table,
+  .standings-table {
+    font-size: 0.8rem;
+  }
+  
+  .stats-table .stats-cell,
+  .standings-table .position,
+  .standings-table .wins,
+  .standings-table .losses,
+  .standings-table .games-for,
+  .standings-table .games-against,
+  .standings-table .games-difference {
+    text-align: center;
+  }
+  
+  /* Improve table header readability */
+  .stats-header,
+  .standings-header {
+    font-weight: 700;
+    background: #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  
+  /* Add subtle borders for better separation */
+  .stats-row,
+  .standings-row {
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .stats-row:nth-child(even),
+  .standings-row:nth-child(even) {
+    background: #f8fafc;
+  }
+}
+
 .stats-note {
   background: #f0f8ff;
   border: 1px solid #b3d9ff;
@@ -1546,6 +1624,482 @@ body {
 
 /* Responsive Design */
 
+/* Mobile-first approach */
+@media (max-width: 480px) {
+  .app-main {
+    padding: 0.5rem;
+  }
+  
+  .app-header {
+    padding: 0.75rem;
+  }
+  
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .app-header p {
+    font-size: 0.85rem;
+  }
+  
+  /* Tournament List */
+  .tournament-list {
+    padding: 0.75rem;
+  }
+  
+  .tournament-list-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .tournament-list-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .tournament-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .tournament-card {
+    padding: 0.75rem;
+  }
+  
+  .tournament-card-header h3 {
+    font-size: 1rem;
+  }
+  
+  .tournament-card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .tournament-card-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Create Tournament */
+  .create-tournament {
+    padding: 0.75rem;
+  }
+  
+  .create-tournament-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .create-tournament-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .tournament-name-form,
+  .auto-team-form,
+  .team-form {
+    padding: 0.75rem;
+  }
+  
+  .tournament-name-input {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .auto-team-inputs {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .team-inputs {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .teams-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .team-card {
+    padding: 0.5rem;
+  }
+  
+  .team-info h4 {
+    font-size: 0.85rem;
+  }
+  
+  .team-info p {
+    font-size: 0.75rem;
+  }
+  
+  /* Tournament View */
+  .tournament-view {
+    padding: 0.75rem;
+  }
+  
+  .tournament-view-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+  
+  .tournament-info h2 {
+    font-size: 1.2rem;
+  }
+  
+  .tournament-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+  }
+  
+  .tournament-navigation {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.25rem;
+  }
+  
+  .nav-btn {
+    flex: 1;
+    min-width: auto;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Match Cards */
+  .match-card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .match-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .match-info {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+  }
+  
+  .match-teams {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .team {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+  
+  .team-name {
+    font-size: 0.9rem;
+  }
+  
+  .team-score {
+    font-size: 1rem;
+  }
+  
+  .match-vs {
+    font-size: 0.8rem;
+  }
+  
+  .score-inputs {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .score-input {
+    text-align: center;
+  }
+  
+  .result-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .result-actions .btn {
+    width: 100%;
+  }
+  
+  /* Group View */
+  .groups-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .group-card {
+    padding: 0.75rem;
+  }
+  
+  .group-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .group-header h3,
+  .group-header h4 {
+    font-size: 1rem;
+  }
+  
+  /* Tables - Make them scrollable horizontally */
+  .standings-table,
+  .stats-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  /* Add scroll indicator for tables */
+  .standings-table::after,
+  .stats-table::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* Mobile table improvements */
+  .standings-table {
+    margin: 0 -0.5rem;
+    border-radius: 0;
+  }
+  
+  .stats-table {
+    margin: 0 -0.5rem;
+    border-radius: 0;
+  }
+  
+  .standings-header,
+  .standings-row {
+    grid-template-columns: 20px 1fr 25px 25px 25px 25px 25px;
+    gap: 0.2rem;
+    font-size: 0.65rem;
+    padding: 0.4rem;
+    min-width: 350px;
+  }
+  
+  /* Make standings table more compact on very small screens */
+  @media (max-width: 360px) {
+    .standings-header,
+    .standings-row {
+      grid-template-columns: 18px 1fr 22px 22px 22px 22px 22px;
+      gap: 0.15rem;
+      font-size: 0.6rem;
+      padding: 0.3rem;
+      min-width: 320px;
+    }
+  }
+  
+  .stats-header,
+  .stats-row {
+    grid-template-columns: 25px 1fr 25px 25px 25px 30px 25px 25px 25px;
+    gap: 0.2rem;
+    font-size: 0.65rem;
+    padding: 0.4rem;
+    min-width: 450px;
+  }
+  
+  /* Make stats table more compact on very small screens */
+  @media (max-width: 360px) {
+    .stats-header,
+    .stats-row {
+      grid-template-columns: 20px 1fr 20px 20px 20px 25px 20px 20px 20px;
+      gap: 0.15rem;
+      font-size: 0.6rem;
+      padding: 0.3rem;
+      min-width: 400px;
+    }
+    
+    .position-number {
+      font-size: 0.7rem;
+    }
+    
+    .team-name {
+      font-size: 0.7rem;
+    }
+    
+    .stats-cell {
+      font-size: 0.7rem;
+    }
+  }
+  
+  /* Bracket View */
+  .bracket-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .bracket-round {
+    padding: 0.75rem;
+  }
+  
+  .bracket-round h3 {
+    font-size: 1rem;
+  }
+  
+  /* Stats View */
+  .stats-container {
+    gap: 1rem;
+  }
+  
+  .stats-section h3,
+  .group-stats-section h3 {
+    font-size: 1rem;
+  }
+  
+  /* Manual Group Setup */
+  .manual-group-setup {
+    padding: 0.75rem;
+  }
+  
+  .setup-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .setup-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .control-group {
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .setup-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .unassigned-section {
+    padding: 0.75rem;
+  }
+  
+  .unassigned-section h3 {
+    font-size: 1rem;
+  }
+  
+  .groups-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .group-card {
+    padding: 0.75rem;
+  }
+  
+  .group-header h4 {
+    font-size: 0.9rem;
+  }
+  
+  .start-options {
+    gap: 1rem;
+  }
+  
+  /* Buttons */
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+  
+  .btn-large {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .btn-small {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.7rem;
+  }
+  
+  /* Input fields */
+  .input {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+  
+  /* Modal */
+  .add-extra-match-modal {
+    padding: 0.5rem;
+  }
+  
+  .modal-content {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .modal-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+  }
+  
+  /* Section headers */
+  .section-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  
+  .section-header h3 {
+    font-size: 1rem;
+  }
+  
+  /* Overview sections */
+  .overview-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .overview-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .upcoming-matches,
+  .elimination-matches {
+    gap: 0.75rem;
+  }
+  
+  /* Extra match styling */
+  .extra-badge {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+  }
+  
+  /* Delete button in match cards */
+  .match-header .btn-danger {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+  }
+}
+
 /* Large screens (1200px and up) */
 @media (min-width: 1200px) {
   .app-main {
@@ -1575,6 +2129,10 @@ body {
     padding: 1.5rem;
   }
   
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
   .tournament-grid {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
@@ -1590,10 +2148,48 @@ body {
   .bracket-container {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
+  
+  /* Tournament View improvements */
+  .tournament-navigation {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .nav-btn {
+    flex: 0 1 auto;
+    min-width: 120px;
+  }
+  
+  /* Match cards */
+  .match-teams {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .team {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+  
+  /* Tables */
+  .standings-header,
+  .standings-row {
+    grid-template-columns: 40px 1fr 40px 40px 40px 40px 40px;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .stats-header,
+  .stats-row {
+    grid-template-columns: 45px 1fr 40px 40px 40px 45px 40px 40px 40px;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+  }
 }
 
 /* Small screens (481px to 768px) */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 481px) {
   .app-main {
     padding: 1rem;
   }
@@ -1603,11 +2199,11 @@ body {
   }
   
   .app-header h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .app-header p {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   /* Tournament List */
@@ -1762,10 +2358,18 @@ body {
   
   .stats-header,
   .stats-row {
-    grid-template-columns: 40px 1fr 35px 35px 35px 40px 35px 35px 35px;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    padding: 0.75rem;
+    grid-template-columns: 35px 1fr 30px 30px 30px 35px 30px 30px 30px;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    padding: 0.6rem;
+    min-width: 600px;
+  }
+  
+  /* Make tables scrollable on small screens */
+  .standings-table,
+  .stats-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Manual Group Setup */
@@ -2012,13 +2616,31 @@ body {
   .stats-table {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin: 0 -0.75rem;
+    border-radius: 0;
   }
   
   .standings-header,
-  .standings-row,
+  .standings-row {
+    min-width: 320px;
+  }
+  
   .stats-header,
   .stats-row {
-    min-width: 600px;
+    min-width: 400px;
+  }
+  
+  /* Add scroll hint */
+  .stats-table::before,
+  .standings-table::before {
+    content: '← Desliza para ver más →';
+    display: block;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #718096;
+    padding: 0.5rem;
+    background: #f7fafc;
+    border-bottom: 1px solid #e2e8f0;
   }
 }
 
