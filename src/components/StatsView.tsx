@@ -79,7 +79,11 @@ export default function StatsView({ tournamentId }: StatsViewProps) {
         <p>Los datos apareceran cuando se jueguen los primeros partidos.</p>
         </div>
       ) : (
-        <div className="stats-container">
+        <>
+          <div className="stats-note">
+            <p><small>💡 Las estadísticas incluyen todos los partidos jugados, incluyendo partidos extra.</small></p>
+          </div>
+          <div className="stats-container">
                   {/* Estadisticas por Grupo */}
         <div className="group-stats-section">
           <h3>Estadisticas por Grupo</h3>
@@ -127,6 +131,7 @@ export default function StatsView({ tournamentId }: StatsViewProps) {
             </div>
           </div>
         </div>
+        </>
       )}
     </div>
   );

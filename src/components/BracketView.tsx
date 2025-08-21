@@ -6,6 +6,7 @@ interface BracketViewProps {
   semifinals: Match[];
   final: Match | null;
   onMatchResult: (matchId: string, team1Score: number, team2Score: number) => void;
+  onDeleteMatch?: (matchId: string) => void;
 }
 
 export default function BracketView({
@@ -13,6 +14,7 @@ export default function BracketView({
   semifinals,
   final,
   onMatchResult,
+  onDeleteMatch,
 }: BracketViewProps) {
   return (
     <div className="bracket-view">
@@ -29,6 +31,7 @@ export default function BracketView({
                   key={match.id}
                   match={match}
                   onResultSubmit={onMatchResult}
+                  onDelete={onDeleteMatch}
                 />
               ))}
             </div>
@@ -41,8 +44,8 @@ export default function BracketView({
           {semifinals.length === 0 ? (
             <p className="no-matches">
               {quarterfinals.length === 0 
-                        ? 'Las semifinales se generaran automaticamente cuando se completen todos los partidos del grupo unico.'
-        : 'Las semifinales se generaran automaticamente cuando se completen todos los cuartos de final.'
+                ? 'Las semifinales se generaran automaticamente cuando se completen todos los partidos del grupo unico.'
+                : 'Las semifinales se generaran automaticamente cuando se completen todos los cuartos de final.'
               }
             </p>
           ) : (
@@ -52,6 +55,7 @@ export default function BracketView({
                   key={match.id}
                   match={match}
                   onResultSubmit={onMatchResult}
+                  onDelete={onDeleteMatch}
                 />
               ))}
             </div>
@@ -70,17 +74,18 @@ export default function BracketView({
               <MatchCard
                 match={final}
                 onResultSubmit={onMatchResult}
+                onDelete={onDeleteMatch}
               />
             </div>
           )}
         </div>
       </div>
 
-              {/* Campeon */}
+      {/* Campeon */}
       {final?.isCompleted && final.winner && (
         <div className="champion-section">
           <div className="champion-card">
-                            <h3>🏆 Campeon</h3>
+            <h3>🏆 Campeon</h3>
             <div className="champion-team">
               <h2>{final.winner.name}</h2>
               <p>{final.winner.player1.lastName} & {final.winner.player2.lastName}</p>

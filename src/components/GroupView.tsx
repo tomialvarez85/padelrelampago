@@ -4,9 +4,10 @@ import MatchCard from './MatchCard';
 interface GroupViewProps {
   groups: Group[];
   onMatchResult: (matchId: string, team1Score: number, team2Score: number) => void;
+  onDeleteMatch?: (matchId: string) => void;
 }
 
-export default function GroupView({ groups, onMatchResult }: GroupViewProps) {
+export default function GroupView({ groups, onMatchResult, onDeleteMatch }: GroupViewProps) {
   const calculateGroupStats = (group: Group) => {
     const stats: { [teamId: string]: { 
       wins: number; 
@@ -173,6 +174,7 @@ export default function GroupView({ groups, onMatchResult }: GroupViewProps) {
                       key={match.id}
                       match={match}
                       onResultSubmit={onMatchResult}
+                      onDelete={onDeleteMatch}
                       showGroup={false}
                     />
                   ))}

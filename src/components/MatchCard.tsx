@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import type { Match } from '../types';
-import { Check, Edit } from 'lucide-react';
+import { Check, Edit, Trash2 } from 'lucide-react';
 
 interface MatchCardProps {
   match: Match;
   onResultSubmit: (matchId: string, team1Score: number, team2Score: number) => void;
+  onDelete?: (matchId: string) => void;
   showGroup?: boolean;
+  isExtra?: boolean;
 }
 
 export default function MatchCard({
   match,
   onResultSubmit,
+  onDelete,
   showGroup = false,
+  isExtra = false,
 }: MatchCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [team1Score, setTeam1Score] = useState(match.team1Score?.toString() || '');
@@ -36,6 +40,12 @@ export default function MatchCard({
     setIsEditing(true);
   };
 
+  const handleDelete = () => {
+    if (confirm('¿Estás seguro de que quieres borrar este partido?')) {
+      onDelete?.(match.id);
+    }
+  };
+
   const getRoundLabel = () => {
     switch (match.round) {
       case 'group': return 'Grupo';
@@ -48,11 +58,23 @@ export default function MatchCard({
   };
 
   return (
-    <div className={`match-card ${match.isCompleted ? 'completed' : ''}`}>
+    <div className={`match-card ${match.isCompleted ? 'completed' : ''} ${isExtra ? 'extra-match' : ''}`}>
       <div className="match-header">
-        <span className="match-round">{getRoundLabel()}</span>
-        {showGroup && match.groupId && (
-          <span className="match-group">Grupo {match.groupId.split('-')[1]}</span>
+        <div className="match-info">
+          <span className="match-round">{getRoundLabel()}</span>
+          {isExtra && <span className="extra-badge">EXTRA</span>}
+          {showGroup && match.groupId && (
+            <span className="match-group">Grupo {match.groupId.split('-')[1]}</span>
+          )}
+        </div>
+        {onDelete && (
+          <button
+            onClick={handleDelete}
+            className="btn btn-danger btn-small"
+            title="Borrar partido"
+          >
+            <Trash2 size={14} />
+          </button>
         )}
       </div>
 

@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { TournamentService } from '../services/tournamentService';
 import type { Tournament, Group } from '../types';
-import { ArrowLeft, Trophy, BarChart3, Users } from 'lucide-react';
+import { ArrowLeft, Trophy, BarChart3, Users, Plus } from 'lucide-react';
 import MatchCard from './MatchCard';
 import GroupView from './GroupView';
 import BracketView from './BracketView';
 import StatsView from './StatsView';
 import ManualGroupSetup from './ManualGroupSetup';
+import AddExtraMatch from './AddExtraMatch';
 
 interface TournamentViewProps {
   tournament: Tournament;
@@ -22,6 +23,7 @@ export default function TournamentView({
   onTournamentUpdated,
 }: TournamentViewProps) {
   const [view, setView] = useState<View>('overview');
+  const [showAddMatch, setShowAddMatch] = useState(false);
 
   const handleManualGroupsCreated = (groups: Group[]) => {
     try {
@@ -41,6 +43,30 @@ export default function TournamentView({
     onTournamentUpdated();
   };
 
+  const handleDeleteMatch = (matchId: string) => {
+    try {
+      TournamentService.deleteMatch(tournament.id, matchId);
+      onTournamentUpdated();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error al borrar el partido');
+    }
+  };
+
+  const handleAddExtraMatch = (
+    team1Id: string,
+    team2Id: string,
+    round: 'group' | 'quarterfinal' | 'semifinal' | 'final',
+    groupId?: string
+  ) => {
+    try {
+      TournamentService.addExtraMatch(tournament.id, team1Id, team2Id, round, groupId);
+      onTournamentUpdated();
+      setShowAddMatch(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Error al agregar el partido extra');
+    }
+  };
+
   const handleGenerateNextRound = () => {
     try {
       TournamentService.generateNextRound(tournament.id);
@@ -56,9 +82,13 @@ export default function TournamentView({
 
   const handleFillRandomResults = () => {
     try {
-      TournamentService.fillRandomResults(tournament.id);
+      console.log('Iniciando fillRandomResults para torneo:', tournament.id);
+      const updatedTournament = TournamentService.fillRandomResults(tournament.id);
+      console.log('Tournament actualizado:', updatedTournament);
       onTournamentUpdated();
+      console.log('Función completada exitosamente');
     } catch (error) {
+      console.error('Error en handleFillRandomResults:', error);
       alert(error instanceof Error ? error.message : 'Error al rellenar resultados aleatorios');
     }
   };
@@ -203,15 +233,15 @@ export default function TournamentView({
                 {/* Botones para rellenar resultados aleatorios */}
                 <div className="random-results-section">
                   <div className="random-results-info">
-                    <h3>Rellenar Resultados Aleatorios</h3>
-                    <p>Rellena automaticamente todos los partidos pendientes con resultados aleatorios</p>
+                    <h3>Completar Resultados Aleatorios</h3>
+                    <p>Completa automaticamente todos los partidos pendientes con resultados aleatorios</p>
                   </div>
                   <div className="random-results-buttons">
                     <button 
                       onClick={handleFillRandomResults}
                       className="btn btn-secondary btn-large"
                     >
-                      🎲 Rellenar Todos los Partidos
+                      🎲 Completar Todos los Partidos
                     </button>
                     <div className="round-specific-buttons">
                       <button 
@@ -249,7 +279,16 @@ export default function TournamentView({
                 </div>
 
                 <div className="overview-section">
-                  <h3>Proximos Partidos</h3>
+                  <div className="section-header">
+                    <h3>Proximos Partidos</h3>
+                    <button
+                      onClick={() => setShowAddMatch(true)}
+                      className="btn btn-primary btn-small"
+                    >
+                      <Plus size={16} />
+                      Agregar Partido Extra
+                    </button>
+                  </div>
                   <div className="upcoming-matches">
                     {tournament.groups.flatMap(group => 
                       group.matches.filter(match => !match.isCompleted)
@@ -258,7 +297,9 @@ export default function TournamentView({
                         key={match.id}
                         match={match}
                         onResultSubmit={handleMatchResult}
+                        onDelete={handleDeleteMatch}
                         showGroup={true}
+                        isExtra={match.id.startsWith('extra-')}
                       />
                     ))}
                   </div>
@@ -273,6 +314,7 @@ export default function TournamentView({
                           key={match.id}
                           match={match}
                           onResultSubmit={handleMatchResult}
+                          onDelete={handleDeleteMatch}
                         />
                       ))}
                     </div>
@@ -288,6 +330,7 @@ export default function TournamentView({
                           key={match.id}
                           match={match}
                           onResultSubmit={handleMatchResult}
+                          onDelete={handleDeleteMatch}
                         />
                       ))}
                     </div>
@@ -301,6 +344,7 @@ export default function TournamentView({
                       <MatchCard
                         match={tournament.final}
                         onResultSubmit={handleMatchResult}
+                        onDelete={handleDeleteMatch}
                       />
                     </div>
                   </div>
@@ -312,6 +356,7 @@ export default function TournamentView({
               <GroupView
                 groups={tournament.groups}
                 onMatchResult={handleMatchResult}
+                onDeleteMatch={handleDeleteMatch}
               />
             )}
 
@@ -321,6 +366,7 @@ export default function TournamentView({
                 semifinals={tournament.semifinals}
                 final={tournament.final}
                 onMatchResult={handleMatchResult}
+                onDeleteMatch={handleDeleteMatch}
               />
             )}
 
@@ -337,6 +383,15 @@ export default function TournamentView({
             )}
           </div>
         </>
+      )}
+
+      {showAddMatch && (
+        <AddExtraMatch
+          teams={tournament.teams}
+          groups={tournament.groups.map(g => ({ id: g.id, name: g.name }))}
+          onAddMatch={handleAddExtraMatch}
+          onCancel={() => setShowAddMatch(false)}
+        />
       )}
     </div>
   );
