@@ -1,5 +1,6 @@
 import type { Match } from '../types';
 import MatchCard from './MatchCard';
+import { Trophy } from 'lucide-react';
 
 interface BracketViewProps {
   quarterfinals: Match[];
@@ -7,6 +8,10 @@ interface BracketViewProps {
   final: Match | null;
   onMatchResult: (matchId: string, team1Score: number, team2Score: number) => void;
   onDeleteMatch?: (matchId: string) => void;
+  onRandomFill?: () => void;
+  onGenerateNextRound?: () => void;
+  canGenerateNextRound?: boolean;
+  nextRoundName?: string;
 }
 
 export default function BracketView({
@@ -15,10 +20,37 @@ export default function BracketView({
   final,
   onMatchResult,
   onDeleteMatch,
+  onRandomFill,
+  onGenerateNextRound,
+  canGenerateNextRound,
+  nextRoundName,
 }: BracketViewProps) {
   return (
     <div className="bracket-view">
-      <h2>Fase de Eliminacion</h2>
+      <div className="bracket-view-header">
+        <h2>Fase de Eliminacion</h2>
+        <div className="bracket-view-actions">
+          {canGenerateNextRound && onGenerateNextRound && nextRoundName && (
+            <button 
+              className="btn btn-primary btn-large"
+              onClick={onGenerateNextRound}
+              title={`Generar ${nextRoundName}`}
+            >
+              <Trophy size={20} />
+              Generar {nextRoundName}
+            </button>
+          )}
+          {onRandomFill && (
+            <button 
+              className="random-fill-btn"
+              onClick={onRandomFill}
+              title="Llenar todos los partidos aleatoriamente"
+            >
+              🎲 Llenar Aleatoriamente
+            </button>
+          )}
+        </div>
+      </div>
       
       <div className="bracket-container">
         {/* Cuartos de Final - solo mostrar si existen */}
