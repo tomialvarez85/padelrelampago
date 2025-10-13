@@ -5,9 +5,10 @@ interface GroupViewProps {
   groups: Group[];
   onMatchResult: (matchId: string, team1Score: number, team2Score: number) => void;
   onDeleteMatch?: (matchId: string) => void;
+  onRandomFill?: () => void;
 }
 
-export default function GroupView({ groups, onMatchResult, onDeleteMatch }: GroupViewProps) {
+export default function GroupView({ groups, onMatchResult, onDeleteMatch, onRandomFill }: GroupViewProps) {
   const calculateGroupStats = (group: Group) => {
     const stats: { [teamId: string]: { 
       wins: number; 
@@ -114,7 +115,18 @@ export default function GroupView({ groups, onMatchResult, onDeleteMatch }: Grou
 
   return (
     <div className="group-view">
-      <h2>Fase de Grupos</h2>
+      <div className="group-view-header">
+        <h2>Fase de Grupos</h2>
+        {onRandomFill && (
+          <button 
+            className="random-fill-btn"
+            onClick={onRandomFill}
+            title="Llenar todos los partidos aleatoriamente"
+          >
+            🎲 Llenar Aleatoriamente
+          </button>
+        )}
+      </div>
       
       <div className="groups-grid">
         {groups.map((group) => {

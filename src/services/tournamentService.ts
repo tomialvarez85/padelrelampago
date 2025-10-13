@@ -1342,4 +1342,80 @@ export class TournamentService {
     
     return allMatches;
   }
+
+  // Funcion para llenar aleatoriamente todos los partidos incompletos
+  static fillAllMatchesRandomly(tournamentId: string): Tournament {
+    const tournaments = this.getStoredTournaments();
+    const tournamentIndex = tournaments.findIndex(t => t.id === tournamentId);
+    
+    if (tournamentIndex === -1) {
+      throw new Error('Tournament not found');
+    }
+
+    const tournament = tournaments[tournamentIndex];
+    
+    // Función para generar un resultado aleatorio
+    const generateRandomScore = () => {
+      // Generar puntuaciones entre 0 y 6 (típico en pádel)
+      const score1 = Math.floor(Math.random() * 7);
+      const score2 = Math.floor(Math.random() * 7);
+      
+      // Asegurar que no sea empate (0-0 no es válido en pádel)
+      if (score1 === score2) {
+        return score1 === 0 ? [1, 0] : [score1, score2];
+      }
+      
+      return [score1, score2];
+    };
+
+    // Llenar partidos de grupos
+    for (const group of tournament.groups) {
+      for (const match of group.matches) {
+        if (!match.isCompleted) {
+          const [score1, score2] = generateRandomScore();
+          match.team1Score = score1;
+          match.team2Score = score2;
+          match.winner = score1 > score2 ? match.team1 : match.team2;
+          match.isCompleted = true;
+        }
+      }
+    }
+
+    // Llenar cuartos de final
+    for (const match of tournament.quarterfinals) {
+      if (!match.isCompleted) {
+        const [score1, score2] = generateRandomScore();
+        match.team1Score = score1;
+        match.team2Score = score2;
+        match.winner = score1 > score2 ? match.team1 : match.team2;
+        match.isCompleted = true;
+      }
+    }
+
+    // Llenar semifinales
+    for (const match of tournament.semifinals) {
+      if (!match.isCompleted) {
+        const [score1, score2] = generateRandomScore();
+        match.team1Score = score1;
+        match.team2Score = score2;
+        match.winner = score1 > score2 ? match.team1 : match.team2;
+        match.isCompleted = true;
+      }
+    }
+
+    // Llenar final
+    if (tournament.final && !tournament.final.isCompleted) {
+      const [score1, score2] = generateRandomScore();
+      tournament.final.team1Score = score1;
+      tournament.final.team2Score = score2;
+      tournament.final.winner = score1 > score2 ? tournament.final.team1 : tournament.final.team2;
+      tournament.final.isCompleted = true;
+      tournament.isCompleted = true;
+    }
+
+    tournaments[tournamentIndex] = tournament;
+    this.saveTournaments(tournaments);
+    
+    return tournament;
+  }
 } 

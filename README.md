@@ -4,7 +4,7 @@ Una aplicación web moderna para gestionar torneos de pádel a 1 Set. Desarrolla
 
 ## ✨ Características
 
-- **Gestión de Equipos**: Ingresa fácilmente los apellidos de los jugadores para formar equipos
+- **Gestión de Equipos**: Ingresa facilmente los apellidos de los jugadores para formar equipos
 - **Armado de Grupos**: Distribución manual de equipos en grupos según preferencias
 - **Fase de Grupos**: Todos contra todos dentro de cada grupo
 - **Fase de Eliminación**: Cuartos de final, semifinales y final automáticas

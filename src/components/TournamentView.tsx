@@ -76,6 +76,17 @@ export default function TournamentView({
     }
   };
 
+  const handleRandomFill = () => {
+    if (confirm('¿Estás seguro de que quieres llenar todos los partidos aleatoriamente? Esta acción no se puede deshacer.')) {
+      try {
+        TournamentService.fillAllMatchesRandomly(tournament.id);
+        onTournamentUpdated();
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Error al llenar los partidos aleatoriamente');
+      }
+    }
+  };
+
   const getNextRoundInfo = () => {
     return TournamentService.canGenerateNextRound(tournament.id);
   };
@@ -291,18 +302,26 @@ export default function TournamentView({
                 groups={tournament.groups}
                 onMatchResult={handleMatchResult}
                 onDeleteMatch={handleDeleteMatch}
+                onRandomFill={handleRandomFill}
               />
             )}
 
-            {view === 'bracket' && (
-              <BracketView
-                quarterfinals={tournament.quarterfinals}
-                semifinals={tournament.semifinals}
-                final={tournament.final}
-                onMatchResult={handleMatchResult}
-                onDeleteMatch={handleDeleteMatch}
-              />
-            )}
+            {view === 'bracket' && (() => {
+              const nextRoundInfo = getNextRoundInfo();
+              return (
+                <BracketView
+                  quarterfinals={tournament.quarterfinals}
+                  semifinals={tournament.semifinals}
+                  final={tournament.final}
+                  onMatchResult={handleMatchResult}
+                  onDeleteMatch={handleDeleteMatch}
+                  onRandomFill={handleRandomFill}
+                  onGenerateNextRound={handleGenerateNextRound}
+                  canGenerateNextRound={nextRoundInfo.canGenerate}
+                  nextRoundName={nextRoundInfo.nextRound}
+                />
+              );
+            })()}
 
             {view === 'stats' && (
               <StatsView tournamentId={tournament.id} />
