@@ -16,7 +16,7 @@ Una aplicación web moderna para gestionar torneos de pádel a 1 Set. Desarrolla
 ## 🚀 Instalación y Uso
 
 ### Prerrequisitos
-- Node.js (versión 18 o superior)
+- Node.js (version 18 o superior)
 - npm o yarn
 
 ### Instalación
